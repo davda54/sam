@@ -41,8 +41,8 @@ class SAM(torch.optim.Optimizer):
 
     def _grad_norm(self):
         norm = torch.norm(
-                    torch.cat([
-                        p.grad.flatten()
+                    torch.stack([
+                        p.grad.norm(p=2)
                         for group in self.param_groups for p in group["params"]
                     ]),
                     p=2
