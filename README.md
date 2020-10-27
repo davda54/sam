@@ -18,7 +18,8 @@ from sam import SAM
 ...
 
 model = YourModel()
-optimizer = SAM(model.parameters())
+base_optimizer = torch.optim.SGD  # define an optimizer for the "sharpness-aware" update
+optimizer = SAM(model.parameters(), base_optimizer, lr=0.1, momentum=0.9)
 ...
 
 for input, output in data:
