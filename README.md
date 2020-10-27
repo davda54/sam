@@ -12,6 +12,15 @@ SAM simultaneously minimizes loss value and loss sharpness. In particular, it se
 
 This is an unofficial repository for [Sharpness-Aware Minimization for Efficiently Improving Generalization](https://arxiv.org/abs/2010.01412). Implementation-wise, SAM class is a light wrapper that computes the regularized "sharpness-aware" gradient that is used by the underlying optimizer (such as SGD with momentum). This repository also includes a simple WRN for Cifar10; as a proof-of-concept, it beats the performance of SGD with momentum on this dataset.
 
+<p align="center">
+  <img src="img/loss_landscape.png" alt="Loss landscape with and without SAM" width="512"/>  
+</p>
+
+<p align="center">
+  <sub><em>ResNet loss landscape at the end of training with and without SAM. Sharpness-aware updates lead to a significantly wider minimum, which then leads to better generalization properties.</em></sub>
+</p>
+
+<br>
 
 ## Usage
 
@@ -38,6 +47,8 @@ for input, output in data:
   optimizer.second_step(zero_grad=True)
 ...
 ```
+
+<br>
 
 ## Documentation
 
