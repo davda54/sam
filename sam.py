@@ -44,6 +44,7 @@ class SAM(torch.optim.Optimizer):
                     torch.stack([
                         p.grad.norm(p=2)
                         for group in self.param_groups for p in group["params"]
+                        if p.grad is not None
                     ]),
                     p=2
                )
