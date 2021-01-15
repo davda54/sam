@@ -50,6 +50,33 @@ for input, output in data:
 
 <br>
 
+**Alternative usage with a single closure-based `step` function**. This alternative offers similar API to native PyTorch optimizers like LBFGS (kindly suggested by [@rmcavoy](https://github.com/rmcavoy)):
+
+```python
+from sam import SAM
+...
+
+model = YourModel()
+base_optimizer = torch.optim.SGD  # define an optimizer for the "sharpness-aware" update
+optimizer = SAM(model.parameters(), base_optimizer, lr=0.1, momentum=0.9)
+...
+
+for input, output in data:
+  def closure():
+    loss = loss_function(output, model(input))
+    loss.backward()
+    return loss
+
+  loss = loss_function(output, model(input))
+  loss.backward()
+  optimizer.step(closure)
+  optimizer.zero_grad()
+...
+```
+
+<br>
+
+
 ## Documentation
 
 #### `SAM.__init__`
@@ -80,6 +107,18 @@ Performs the second optimization step that updates the original weights with the
 | **Argument**    | **Description** |
 | :-------------- | :-------------- |
 | `zero_grad` (bool, optional) | set to True if you want to automatically zero-out all gradients after this step *(default: False)* |
+
+<br>
+
+#### `SAM.step`
+
+Performs both optimization steps in a single call. This function is an alternative to explicitly calling `SAM.first_step` and `SAM.second_step`.
+
+| **Argument**    | **Description** |
+| :-------------- | :-------------- |
+| `closure` (callable) | the closure should do an additional full forward and backward pass on the optimized model *(default: None)* |
+
+
 
 
 <br>
