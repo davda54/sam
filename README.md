@@ -43,7 +43,7 @@ for input, output in data:
   optimizer.first_step(zero_grad=True)
   
   # second forward-backward pass
-  loss_function(output, model(input)).backward()
+  loss_function(output, model(input)).backward()  # make sure to do a full forward pass
   optimizer.second_step(zero_grad=True)
 ...
 ```
