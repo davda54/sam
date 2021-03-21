@@ -33,7 +33,6 @@ class Cifar:
 
     def _get_statistics(self):
         train_set = torchvision.datasets.CIFAR10(root='./cifar', train=True, download=True, transform=transforms.ToTensor())
-        test_set = torchvision.datasets.CIFAR10(root='./cifar', train=False, download=True, transform=transforms.ToTensor())
 
-        data = torch.cat([d[0] for d in DataLoader(train_set)] + [d[0] for d in DataLoader(test_set)])
+        data = torch.cat([d[0] for d in DataLoader(train_set)])
         return data.mean(dim=[0, 2, 3]), data.std(dim=[0, 2, 3])
