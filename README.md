@@ -74,6 +74,30 @@ for input, output in data:
 ...
 ```
 
+### Training tips
+- [@hjq133](https://github.com/hjq133): The suggested usage can potentially cause problems if you use batch normalization. The running statistics are computed in both forward passes, but they should be computed only for the first one. A possible solution is to use these two functions (kindly suggested by [@evanatyourservice](https://github.com/evanatyourservice) and [@slala2121](https://github.com/slala2121)) to bypass the running statistics during the second pass:
+```python
+def disable_bn(model):
+  for module in model.modules():
+    if isinstance(module, nn.BatchNorm):
+      module.eval()
+
+def enable_bn(model):
+  model.train()
+```
+- [@evanatyourservice](https://github.com/evanatyourservice): If you plan to train on multiple GPUs, the paper states that *"To compute the SAM update when parallelizing across multiple accelerators, we divide each data batch evenly among the accelerators, independently compute the SAM gradient on each accelerator, and average the resulting sub-batch SAM gradients to obtain the final SAM update."* This can be achieved by the following code:
+```python
+for input, output in data:
+  # first forward-backward pass
+  loss = loss_function(output, model(input))
+  loss.backward()
+  optimizer.first_step(zero_grad=True)
+  
+  # second forward-backward pass
+  loss_function(output, model(input)).backward()
+  reduce_gradients_from_all_accelerators()  # <- this is the important line
+  optimizer.second_step(zero_grad=True)
+```
 <br>
 
 
