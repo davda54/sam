@@ -1,5 +1,6 @@
-<h1 align="center"><b>SAM Optimizer</b></h1>
-<h3 align="center"><b>Sharpness-Aware Minimization for Efficiently Improving Generalization</b></h1>
+<h1 align="center"><b>(Adaptive) SAM Optimizer</b></h1>
+<h3 align="center"><b>Sharpness-Aware Minimization for Efficiently Improving Generalization</b></h3>
+<h3 align="center"><b>ASAM: Adaptive Sharpness-Aware Minimization for Scale-Invariant Learning of Deep Neural Networks</b></h3>
 <p align="center">
   <i>~ in Pytorch ~</i>
 </p> 
@@ -10,7 +11,7 @@
 
 SAM simultaneously minimizes loss value and loss sharpness. In particular, it seeks parameters that lie in **neighborhoods having uniformly low loss**. SAM improves model generalization and yields [SoTA performance for several datasets](https://paperswithcode.com/paper/sharpness-aware-minimization-for-efficiently-1). Additionally, it provides robustness to label noise on par with that provided by SoTA procedures that specifically target learning with noisy labels.
 
-This is an **unofficial** repository for [Sharpness-Aware Minimization for Efficiently Improving Generalization](https://arxiv.org/abs/2010.01412). Implementation-wise, SAM class is a light wrapper that computes the regularized "sharpness-aware" gradient, which is used by the underlying optimizer (such as SGD with momentum). This repository also includes a simple [WRN for Cifar10](example); as a proof-of-concept, it beats the performance of SGD with momentum on this dataset.
+This is an **unofficial** repository for [Sharpness-Aware Minimization for Efficiently Improving Generalization](https://arxiv.org/abs/2010.01412) and [ASAM: Adaptive Sharpness-Aware Minimization for Scale-Invariant Learning of Deep Neural Networks](https://arxiv.org/abs/2102.11600). Implementation-wise, SAM class is a light wrapper that computes the regularized "sharpness-aware" gradient, which is used by the underlying optimizer (such as SGD with momentum). This repository also includes a simple [WRN for Cifar10](example); as a proof-of-concept, it beats the performance of SGD with momentum on this dataset.
 
 <p align="center">
   <img src="img/loss_landscape.png" alt="Loss landscape with and without SAM" width="512"/>  
@@ -98,8 +99,8 @@ for input, output in data:
   reduce_gradients_from_all_accelerators()  # <- this is the important line
   optimizer.second_step(zero_grad=True)
 ```
+- [@evanatyourservice](https://github.com/evanatyourservice): Adaptive SAM reportedly performs better than the original SAM. The ASAM paper suggests to use higher `rho` for the adaptive updates (~10x lar$
 <br>
-
 
 ## Documentation
 
@@ -110,6 +111,7 @@ for input, output in data:
 | `params` (iterable) | iterable of parameters to optimize or dicts defining parameter groups |
 | `base_optimizer` (torch.optim.Optimizer) | underlying optimizer that does the "sharpness-aware" update |
 | `rho` (float, optional)           | size of the neighborhood for computing the max loss *(default: 0.05)* |
+| `adaptive` (bool, optional)       | set this argument to True if you want to use an experimental implementation of Adaptive SAM *(default: False)* |
 | `**kwargs` | keyword arguments passed to the `__init__` method of `base_optimizer` |
 
 <br>
@@ -149,9 +151,10 @@ Performs both optimization steps in a single call. This function is an alternati
 
 ## Experiments
 
-I've verified that SAM works on a simple WRN 16-8 model run on CIFAR10; you can replicate the experiment by running [train.py](example/train.py). The Wide-ResNet is enhanced only by label smoothing and the most basic image augmentations with cutout, so the errors are higher than those in the [SAM paper](https://arxiv.org/abs/2010.01412). Theoretically, you can get even lower errors by running for longer (1800 epochs instead of 200), because SAM shouldn't be as prone to overfitting.
+I've verified that SAM works on a simple WRN 16-8 model run on CIFAR10; you can replicate the experiment by running [train.py](example/train.py). The Wide-ResNet is enhanced only by label smoothing and the most basic image augmentations with cutout, so the errors are higher than those in the [SAM paper](https://arxiv.org/abs/2010.01412). Theoretically, you can get even lower errors by running for longer (1800 epochs instead of 200), because SAM shouldn't be as prone to overfitting. SAM uses `rho=0.05`, while ASAM is set to `rho=0.5`, as suggested in the original paper.
 
-| Optimizer            | Test error rate |
-| :------------------- |   -----: |
-| SGD + momentum       |   3.35 % |
-| SAM + SGD + momentum |   2.98 % |
+| Optimizer             | Test error rate |
+| :-------------------- |   -----: |
+| SGD + momentum        |   3.20 % |
+| SAM + SGD + momentum  |   2.86 % |
+| ASAM + SGD + momentum |   2.83 % |
