@@ -1,6 +1,5 @@
 <h1 align="center"><b>(Adaptive) SAM Optimizer</b></h1>
 <h3 align="center"><b>Sharpness-Aware Minimization for Efficiently Improving Generalization</b></h3>
-<h3 align="center"><b>ASAM: Adaptive Sharpness-Aware Minimization for Scale-Invariant Learning of Deep Neural Networks</b></h3>
 <p align="center">
   <i>~ in Pytorch ~</i>
 </p> 
@@ -99,7 +98,7 @@ for input, output in data:
   reduce_gradients_from_all_accelerators()  # <- this is the important line
   optimizer.second_step(zero_grad=True)
 ```
-- [@evanatyourservice](https://github.com/evanatyourservice): Adaptive SAM reportedly performs better than the original SAM. The ASAM paper suggests to use higher `rho` for the adaptive updates (~10x lar$
+- [@evanatyourservice](https://github.com/evanatyourservice): Adaptive SAM reportedly performs better than the original SAM. The ASAM paper suggests to use higher `rho` for the adaptive updates (~10x larger)
 <br>
 
 ## Documentation
@@ -111,7 +110,7 @@ for input, output in data:
 | `params` (iterable) | iterable of parameters to optimize or dicts defining parameter groups |
 | `base_optimizer` (torch.optim.Optimizer) | underlying optimizer that does the "sharpness-aware" update |
 | `rho` (float, optional)           | size of the neighborhood for computing the max loss *(default: 0.05)* |
-| `adaptive` (bool, optional)       | set this argument to True if you want to use an experimental implementation of Adaptive SAM *(default: False)* |
+| `adaptive` (bool, optional)       | set this argument to True if you want to use an experimental implementation of element-wise Adaptive SAM *(default: False)* |
 | `**kwargs` | keyword arguments passed to the `__init__` method of `base_optimizer` |
 
 <br>
