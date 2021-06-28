@@ -99,7 +99,13 @@ for input, output in data:
   optimizer.second_step(zero_grad=True)
 ```
 - [@evanatyourservice](https://github.com/evanatyourservice): Adaptive SAM reportedly performs better than the original SAM. The ASAM paper suggests to use higher `rho` for the adaptive updates (~10x larger)
+
+- [@mlaves](https://github.com/mlaves): LR scheduling should be either applied to the base optimizer or you should use SAM with a single `step` call (with a closure):
+```python
+scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer.base_optimizer, T_max=200)
+```
 <br>
+
 
 ## Documentation
 
