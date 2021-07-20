@@ -104,7 +104,7 @@ for input, output in data:
 ```python
 scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer.base_optimizer, T_max=200)
 ```
-- [@AlbertoSabater](https://github.com/AlbertoSabater): Integration with Pytorch Lightning —— you can write the `training_step` function as:
+- [@AlbertoSabater](https://github.com/AlbertoSabater): Integration with Pytorch Lightning — you can write the `training_step` function as:
 ```python
 def training_step(self, batch, batch_idx):
     optimizer = self.optimizers()
