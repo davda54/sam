@@ -104,6 +104,23 @@ for input, output in data:
 ```python
 scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer.base_optimizer, T_max=200)
 ```
+- [@AlbertoSabater](https://github.com/AlbertoSabater): Integration with Pytorch Lightning —— you can write the `training_step` function as:
+```python
+def training_step(self, batch, batch_idx):
+    optimizer = self.optimizers()
+
+    # first forward-backward pass
+    loss_1 = self.compute_loss(batch)
+    self.manual_backward(loss_1, optimizer)
+    optimizer.first_step(zero_grad=True)
+
+    # second forward-backward pass
+    loss_2 = self.compute_loss(batch)
+    self.manual_backward(loss_2, optimizer)
+    optimizer.second_step(zero_grad=True)
+
+    return loss_1
+```
 <br>
 
 
