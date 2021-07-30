@@ -173,10 +173,10 @@ Performs both optimization steps in a single call. This function is an alternati
 
 ## Experiments
 
-I've verified that SAM works on a simple WRN 16-8 model run on CIFAR10; you can replicate the experiment by running [train.py](example/train.py). The Wide-ResNet is enhanced only by label smoothing and the most basic image augmentations with cutout, so the errors are higher than those in the [SAM paper](https://arxiv.org/abs/2010.01412). Theoretically, you can get even lower errors by running for longer (1800 epochs instead of 200), because SAM shouldn't be as prone to overfitting. SAM uses `rho=0.05`, while ASAM is set to `rho=0.5`, as suggested in the original paper.
+I've verified that SAM works on a simple WRN 16-8 model run on CIFAR10; you can replicate the experiment by running [train.py](example/train.py). The Wide-ResNet is enhanced only by label smoothing and the most basic image augmentations with cutout, so the errors are higher than those in the [SAM paper](https://arxiv.org/abs/2010.01412). Theoretically, you can get even lower errors by running for longer (1800 epochs instead of 200), because SAM shouldn't be as prone to overfitting. SAM uses `rho=0.05`, while ASAM is set to `rho=2.0`, as suggested [by its authors](https://github.com/davda54/sam/issues/37).
 
 | Optimizer             | Test error rate |
 | :-------------------- |   -----: |
 | SGD + momentum        |   3.20 % |
 | SAM + SGD + momentum  |   2.86 % |
-| ASAM + SGD + momentum |   2.83 % |
+| ASAM + SGD + momentum |   2.55 % |
