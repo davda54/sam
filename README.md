@@ -90,12 +90,12 @@ def enable_bn(model):
 for input, output in data:
   # first forward-backward pass
   loss = loss_function(output, model(input))
-  loss.backward()
+  with model.no_sync():  # <- this is the important line
+    loss.backward()
   optimizer.first_step(zero_grad=True)
   
   # second forward-backward pass
   loss_function(output, model(input)).backward()
-  reduce_gradients_from_all_accelerators()  # <- this is the important line
   optimizer.second_step(zero_grad=True)
 ```
 - [@evanatyourservice](https://github.com/evanatyourservice): Adaptive SAM reportedly performs better than the original SAM. The ASAM paper suggests to use higher `rho` for the adaptive updates (~10x larger)
