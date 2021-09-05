@@ -7,6 +7,8 @@ from data.cifar import Cifar
 from utility.log import Log
 from utility.initialize import initialize
 from utility.step_lr import StepLR
+from utility.bypass_bn import enable_running_stats, disable_running_stats
+
 import sys; sys.path.append("..")
 from sam import SAM
 
@@ -22,7 +24,7 @@ if __name__ == "__main__":
     parser.add_argument("--learning_rate", default=0.1, type=float, help="Base learning rate at the start of the training.")
     parser.add_argument("--momentum", default=0.9, type=float, help="SGD Momentum.")
     parser.add_argument("--threads", default=2, type=int, help="Number of CPU threads for dataloaders.")
-    parser.add_argument("--rho", default=0.5, type=int, help="Rho parameter for SAM.")
+    parser.add_argument("--rho", default=2.0, type=int, help="Rho parameter for SAM.")
     parser.add_argument("--weight_decay", default=0.0005, type=float, help="L2 weight decay.")
     parser.add_argument("--width_factor", default=8, type=int, help="How many times wider compared to normal ResNet.")
     args = parser.parse_args()
@@ -46,12 +48,14 @@ if __name__ == "__main__":
             inputs, targets = (b.to(device) for b in batch)
 
             # first forward-backward step
+            enable_running_stats(model)
             predictions = model(inputs)
             loss = smooth_crossentropy(predictions, targets)
             loss.mean().backward()
             optimizer.first_step(zero_grad=True)
 
             # second forward-backward step
+            disable_running_stats(model)
             smooth_crossentropy(model(inputs), targets).mean().backward()
             optimizer.second_step(zero_grad=True)
 
