@@ -75,16 +75,24 @@ for input, output in data:
 ```
 
 ### Training tips
-- [@hjq133](https://github.com/hjq133): The suggested usage can potentially cause problems if you use batch normalization. The running statistics are computed in both forward passes, but they should be computed only for the first one. A possible solution is to use these two functions (kindly suggested by [@evanatyourservice](https://github.com/evanatyourservice) and [@slala2121](https://github.com/slala2121)) to bypass the running statistics during the second pass:
+- [@hjq133](https://github.com/hjq133): The suggested usage can potentially cause problems if you use batch normalization. The running statistics are computed in both forward passes, but they should be computed only for the first one. A possible solution is to set BN momentum to zero (kindly suggested by [@ahmdtaha](https://github.com/ahmdtaha)) to bypass the running statistics during the second pass. An example usage is on lines [51](https://github.com/davda54/sam/blob/cdcbdc1574022d3a3c3240da136378c38562d51d/example/train.py#L51) and [58](https://github.com/davda54/sam/blob/cdcbdc1574022d3a3c3240da136378c38562d51d/example/train.py#L58) in [example/train.py](https://github.com/davda54/sam/blob/cdcbdc1574022d3a3c3240da136378c38562d51d/example/train.py):
 ```python
-def disable_bn(model):
-  for module in model.modules():
-    if isinstance(module, nn.BatchNorm):
-      module.eval()
+for batch in dataset.train:
+  inputs, targets = (b.to(device) for b in batch)
 
-def enable_bn(model):
-  model.train()
+  # first forward-backward step
+  enable_running_stats(model)  # <- this is the important line
+  predictions = model(inputs)
+  loss = smooth_crossentropy(predictions, targets)
+  loss.mean().backward()
+  optimizer.first_step(zero_grad=True)
+
+  # second forward-backward step
+  disable_running_stats(model)  # <- this is the important line
+  smooth_crossentropy(model(inputs), targets).mean().backward()
+  optimizer.second_step(zero_grad=True)
 ```
+
 - [@evanatyourservice](https://github.com/evanatyourservice): If you plan to train on multiple GPUs, the paper states that *"To compute the SAM update when parallelizing across multiple accelerators, we divide each data batch evenly among the accelerators, independently compute the SAM gradient on each accelerator, and average the resulting sub-batch SAM gradients to obtain the final SAM update."* This can be achieved by the following code:
 ```python
 for input, output in data:
