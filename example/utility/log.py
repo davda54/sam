@@ -37,7 +37,7 @@ class Log:
             accuracy = self.epoch_state["accuracy"] / self.epoch_state["steps"]
 
             print(
-                f"\r┃{self.epoch:12d}  ┃{loss:12.4f}  │{100*accuracy:10.2f} %  ┃{self.learning_rate:12.3e}  │{self._time():>12}  ┃",
+                f"\r|{self.epoch:12d}  |{loss:12.4f}  |{100*accuracy:10.2f} %  |{self.learning_rate:12.3e}  |{self._time():>12}  |",
                 end="",
                 flush=True,
             )
@@ -46,7 +46,7 @@ class Log:
             loss = self.epoch_state["loss"] / self.epoch_state["steps"]
             accuracy = self.epoch_state["accuracy"] / self.epoch_state["steps"]
 
-            print(f"{loss:12.4f}  │{100*accuracy:10.2f} %  ┃", flush=True)
+            print(f"{loss:12.4f}  |{100*accuracy:10.2f} %  |", flush=True)
 
             if accuracy > self.best_accuracy:
                 self.best_accuracy = accuracy
@@ -69,7 +69,7 @@ class Log:
             progress = self.step / self.len_dataset
 
             print(
-                f"\r┃{self.epoch:12d}  ┃{loss:12.4f}  │{100*accuracy:10.2f} %  ┃{learning_rate:12.3e}  │{self._time():>12}  {self.loading_bar(progress)}",
+                f"\r|{self.epoch:12d}  |{loss:12.4f}  |{100*accuracy:10.2f} %  |{learning_rate:12.3e}  |{self._time():>12}  {self.loading_bar(progress)}",
                 end="",
                 flush=True,
             )
