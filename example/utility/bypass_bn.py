@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 
+
 def disable_running_stats(model):
     def _disable(module):
         if isinstance(module, nn.BatchNorm2d):
@@ -8,6 +9,7 @@ def disable_running_stats(model):
             module.momentum = 0
 
     model.apply(_disable)
+
 
 def enable_running_stats(model):
     def _enable(module):

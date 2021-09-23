@@ -144,7 +144,10 @@ class CifarHundred:
 
     def _get_statistics(self):
         train_set = torchvision.datasets.CIFAR100(
-            root="./cifar100", train=True, download=True, transform=transforms.ToTensor()
+            root="./cifar100",
+            train=True,
+            download=True,
+            transform=transforms.ToTensor(),
         )
 
         data = torch.cat([d[0] for d in DataLoader(train_set)])

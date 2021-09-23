@@ -63,7 +63,9 @@ class Log:
 
         if self.step % self.log_each == self.log_each - 1:
             loss = self.last_steps_state["loss"] / self.last_steps_state["steps"]
-            accuracy = self.last_steps_state["accuracy"] / self.last_steps_state["steps"]
+            accuracy = (
+                self.last_steps_state["accuracy"] / self.last_steps_state["steps"]
+            )
 
             self.last_steps_state = {"loss": 0.0, "accuracy": 0.0, "steps": 0}
             progress = self.step / self.len_dataset
@@ -90,7 +92,15 @@ class Log:
         return f"{time_seconds // 60:02d}:{time_seconds % 60:02d} min"
 
     def _print_header(self) -> None:
-        print(f"|-----------------------T--R--A--I--N-----------------S--T--A--T--S-----------------V--A--L--I--D--------|")
-        print(f"|              |              |              |              |              |              |              |")
-        print(f"|       epoch  |        loss  |    accuracy  |        l.r.  |     elapsed  |        loss  |    accuracy  |")
-        print(f"|--------------|--------------|--------------|--------------|--------------|--------------|--------------|")
+        print(
+            f"|-----------------------T--R--A--I--N-----------------S--T--A--T--S-----------------V--A--L--I--D--------|"
+        )
+        print(
+            f"|              |              |              |              |              |              |              |"
+        )
+        print(
+            f"|       epoch  |        loss  |    accuracy  |        l.r.  |     elapsed  |        loss  |    accuracy  |"
+        )
+        print(
+            f"|--------------|--------------|--------------|--------------|--------------|--------------|--------------|"
+        )
