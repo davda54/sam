@@ -25,6 +25,12 @@ if __name__ == "__main__":
         help="True to use CIFAR100, False for CIFAR10.",
     )
     parser.add_argument(
+        "--coarse_labels",
+        default=True,
+        type=bool,
+        help="True to use CIFAR100 coarse granularity of superclasses (20), False for fine class granularity (100).",
+    )
+    parser.add_argument(
         "--adaptive",
         default=True,
         type=bool,
@@ -80,9 +86,19 @@ if __name__ == "__main__":
         dataset = CifarTen(args.batch_size, args.threads)
 
     log = Log(log_each=10)
-    model = WideResNet(
-        args.depth, args.width_factor, args.dropout, in_channels=3, labels=10
-    ).to(device)
+
+    if not args.train100:
+        model = WideResNet(
+            args.depth, args.width_factor, args.dropout, in_channels=3, labels=10
+        ).to(device)
+    elif args.train100 and args.coarse_labels:
+        model = WideResNet(
+            args.depth, args.width_factor, args.dropout, in_channels=3, labels=20
+        ).to(device)
+    else:
+        model = WideResNet(
+            args.depth, args.width_factor, args.dropout, in_channels=3, labels=100
+        ).to(device)
 
     base_optimizer = torch.optim.SGD
     optimizer = SAM(
