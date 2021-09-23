@@ -91,6 +91,6 @@ class Log:
 
     def _print_header(self) -> None:
         print(f"|-----------------------T--R--A--I--N-----------------S--T--A--T--S-----------------V--A--L--I--D--------|")
-        print(f"|              |              ╷              |              ╷              |              ╷              |")
-        print(f"|       epoch  |        loss  │    accuracy  |        l.r.  │     elapsed  |        loss  │    accuracy  |")
+        print(f"|              |              |              |              |              |              |              |")
+        print(f"|       epoch  |        loss  |    accuracy  |        l.r.  |     elapsed  |        loss  |    accuracy  |")
         print(f"|--------------|--------------|--------------|--------------|--------------|--------------|--------------|")
