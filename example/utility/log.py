@@ -90,7 +90,7 @@ class Log:
         return f"{time_seconds // 60:02d}:{time_seconds % 60:02d} min"
 
     def _print_header(self) -> None:
-        print(f"┏━━━━━━━━━━━━━━┳━━━━━━━╸T╺╸R╺╸A╺╸I╺╸N╺━━━━━━━┳━━━━━━━╸S╺╸T╺╸A╺╸T╺╸S╺━━━━━━━┳━━━━━━━╸V╺╸A╺╸L╺╸I╺╸D╺━━━━━━━┓")
-        print(f"┃              ┃              ╷              ┃              ╷              ┃              ╷              ┃")
-        print(f"┃       epoch  ┃        loss  │    accuracy  ┃        l.r.  │     elapsed  ┃        loss  │    accuracy  ┃")
-        print(f"┠──────────────╂──────────────┼──────────────╂──────────────┼──────────────╂──────────────┼──────────────┨")
+        print(f"|-----------------------T--R--A--I--N-----------------S--T--A--T--S-----------------V--A--L--I--D--------|").encode('latin-1')
+        print(f"|              |              ╷              |              ╷              |              ╷              |").encode('latin-1')
+        print(f"|       epoch  |        loss  │    accuracy  |        l.r.  │     elapsed  |        loss  │    accuracy  |").encode('latin-1')
+        print(f"|--------------|--------------|--------------|--------------|--------------|--------------|--------------|").encode('latin-1')
