@@ -3,7 +3,6 @@ import torch
 
 from model.wide_res_net import WideResNet
 from model.smooth_cross_entropy import smooth_crossentropy
-from data.cifar10 import CifarTen
 from data.cifar100 import CifarHundred
 from utility.log import Log
 from utility.initialize import initialize
@@ -21,16 +20,10 @@ from sam import SAM
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--train100",
+        "--fine_labels",
         default=True,
         type=bool,
-        help="True to use CIFAR100, False for CIFAR10.",
-    )
-    parser.add_argument(
-        "--coarse_labels",
-        default=True,
-        type=bool,
-        help="True to use CIFAR100 coarse granularity of superclasses (20), False for fine class granularity (100).",
+        help="True to use CIFAR100 fine granularity, False for coarse class granularity.",
     )
     parser.add_argument(
         "--adaptive",
@@ -89,17 +82,13 @@ if __name__ == "__main__":
 
     log = Log(log_each=10)
 
-    if not args.train100:
+    if args.fine_labels:
         model = WideResNet(
-            args.depth, args.width_factor, args.dropout, in_channels=3, labels=10
-        ).to(device)
-    elif args.train100 and args.coarse_labels:
-        model = WideResNet(
-            args.depth, args.width_factor, args.dropout, in_channels=3, labels=20
+            args.depth, args.width_factor, args.dropout, in_channels=3, labels=100
         ).to(device)
     else:
         model = WideResNet(
-            args.depth, args.width_factor, args.dropout, in_channels=3, labels=100
+            args.depth, args.width_factor, args.dropout, in_channels=3, labels=20
         ).to(device)
 
     base_optimizer = torch.optim.SGD
