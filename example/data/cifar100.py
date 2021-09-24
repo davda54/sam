@@ -5,6 +5,7 @@ from torch.utils.data import DataLoader
 
 from utility.cutout import Cutout
 
+
 class CifarHundred:
     def __init__(self, batch_size, threads):
         mean, std = self._get_statistics()
@@ -37,8 +38,7 @@ class CifarHundred:
             test_set, batch_size=batch_size, shuffle=False, num_workers=threads
         )
 
-        # TODO: Determine if classes are inhereted or if I will need to specify them
-        self.classes = (
+        fine_labels = (
             "apple",
             "aquarium_fish",
             "baby",
@@ -140,6 +140,34 @@ class CifarHundred:
             "woman",
             "worm",
         )
+
+        coarse_labels = (
+            "aquatic_mammals",
+            "fish",
+            "flowers",
+            "food_containers",
+            "fruit_and_vegetables",
+            "household_electrical_devices",
+            "household_furniture",
+            "insects",
+            "large_carnivores",
+            "large_man - made_outdoor_things",
+            "large_natural_outdoor_scenes",
+            "large_omnivores_and_herbivores",
+            "medium_mammals",
+            "non - insect_invertebrates",
+            "people",
+            "reptiles",
+            "small_mammals",
+            "trees",
+            "vehicles_1",
+            "vehicles_2",
+        )
+
+        if True:
+            self.classes = fine_labels
+        else:
+            self.classes = coarse_labels
 
     def _get_statistics(self):
         train_set = torchvision.datasets.CIFAR100(
