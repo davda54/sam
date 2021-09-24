@@ -75,7 +75,7 @@ if __name__ == "__main__":
     initialize(args, seed=42)
     device = torch.device("cuda:7" if torch.cuda.is_available() else "cpu")
 
-    dataset = CifarHundred(args.batch_size, args.threads)
+    dataset = CifarHundred(args.batch_size, args.threads, args.fine_labels)
 
     log = Log(log_each=10)
 

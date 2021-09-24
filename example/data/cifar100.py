@@ -8,7 +8,7 @@ from example.utility.cifar_utils import fine_labels, coarse_labels, coarse_idxs,
 import numpy as np
 
 class CifarHundred:
-    def __init__(self, batch_size, threads):
+    def __init__(self, batch_size, threads, fine_granularity):
         mean, std = self._get_statistics()
 
         train_transform = transforms.Compose(
@@ -32,14 +32,14 @@ class CifarHundred:
             root="./data", train=False, download=True, transform=test_transform
         )
 
-        if True:
+        if fine_granularity:
             self.classes = fine_labels
         else:
-            self.classes = coarse_labels
             train_set.classes, test_set.classes = coarse_labels, coarse_labels
             train_set.class_to_idx, test_set.class_to_idx = coarse_idxs, coarse_idxs
             train_set.targets = list(map(coarse_label_map.get, train_set.targets))
             test_set.targets = list(map(coarse_label_map.get, test_set.targets))
+            self.classes = coarse_labels
 
         self.train = torch.utils.data.DataLoader(
             train_set, batch_size=batch_size, shuffle=True, num_workers=threads
