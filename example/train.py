@@ -139,7 +139,7 @@ if __name__ == "__main__":
     model_filename = str(
         Path.cwd()
         / "output"
-        / f"model_coarse{args.coarse_labels}_width{args.width_factor}_depth{args.depth}"
+        / f"model_fine{args.fine_labels}_width{args.width_factor}_depth{args.depth}"
     )
 
     torch.save(obj=model.state_dict(), f=model_filename)
