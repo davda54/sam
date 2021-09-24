@@ -1,3 +1,5 @@
+import numpy as np
+
 fine_labels = (
     "apple",
     "aquarium_fish",
