@@ -1,10 +1,11 @@
+import numpy as np
 import torch
 import torchvision
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
 
-from example.utility.cutout import Cutout
-from example.utility.cifar_utils import fine_labels, coarse_labels, coarse_idxs, coarse_label_map
+from utility.cutout import Cutout
+from utility.cifar_utils import fine_labels, coarse_labels, coarse_idxs, coarse_label_map
 import numpy as np
 
 class CifarHundred:
