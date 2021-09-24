@@ -12,6 +12,8 @@ from utility.bypass_bn import enable_running_stats, disable_running_stats
 
 import sys
 
+from pathlib import Path
+
 sys.path.append("..")
 from sam import SAM
 
@@ -147,5 +149,9 @@ if __name__ == "__main__":
                 loss = smooth_crossentropy(predictions, targets)
                 correct = torch.argmax(predictions, 1) == targets
                 log(model, loss.cpu(), correct.cpu())
+
+    model_filename = str(Path.cwd()/'output'/f"model_coarse{args.coarse_labels}_width{args.width_factor}_depth{args.depth}")
+
+    torch.save(obj=model.state_dict(), f=model_filename)
 
     log.flush()
