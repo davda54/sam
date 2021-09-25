@@ -77,6 +77,12 @@ if __name__ == "__main__":
 
     dataset = CifarHundred(args.batch_size, args.threads, args.fine_labels)
 
+    model_filename = str(
+        Path.cwd()
+        / "output"
+        / f"model_fine{args.fine_labels}_width{args.width_factor}_depth{args.depth}"
+    )
+
     log = Log(log_each=10)
 
     if args.fine_labels:
@@ -99,6 +105,7 @@ if __name__ == "__main__":
         weight_decay=args.weight_decay,
     )
     scheduler = StepLR(optimizer, args.learning_rate, args.epochs)
+    best_correct=0
 
     for epoch in range(args.epochs):
         model.train()
@@ -135,13 +142,13 @@ if __name__ == "__main__":
                 loss = smooth_crossentropy(predictions, targets)
                 correct = torch.argmax(predictions, 1) == targets
                 log(model, loss.cpu(), correct.cpu())
-
-    model_filename = str(
-        Path.cwd()
-        / "output"
-        / f"model_fine{args.fine_labels}_width{args.width_factor}_depth{args.depth}"
-    )
-
-    torch.save(obj=model.state_dict(), f=model_filename)
+                if correct > best_correct:
+                    best_correct = correct
+                    torch.save({
+                        'epoch': epoch,
+                        'model_state_dict': model.state_dict(),
+                        'optimizer_state_dict': optimizer.state_dict(),
+                        'loss': loss.cpu()
+                    }, model_filename)
 
     log.flush()
