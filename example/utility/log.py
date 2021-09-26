@@ -1,4 +1,4 @@
-from example.utility.loading_bar import LoadingBar
+from utility.loading_bar import LoadingBar
 import time
 
 

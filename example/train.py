@@ -5,10 +5,10 @@ import torch
 from model.wide_res_net import WideResNet
 from model.smooth_cross_entropy import smooth_crossentropy
 from data.cifar100 import CifarHundred
-from example.utility.log import Log
-from example.utility.initialize import initialize
-from example.utility.step_lr import StepLR
-from example.utility.bypass_bn import enable_running_stats, disable_running_stats
+from utility.log import Log
+from utility.initialize import initialize
+from utility.step_lr import StepLR
+from utility.bypass_bn import enable_running_stats, disable_running_stats
 
 import sys
 from pathlib import Path
