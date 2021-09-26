@@ -19,13 +19,13 @@ from sam import SAM
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--fine_classes", dest='fine_classes', action='store_true')
+    parser.add_argument("--fine_classes", dest='use_fine_classes', action='store_true')
     parser.add_argument(
         "--coarse_classes",
-        dest='fine_classes',
+        dest='use_fine_classes',
         action='store_false',
     )
-    parser.set_defaults(fine_classes=True)
+    parser.set_defaults(use_fine_classes=True)
     parser.add_argument(
         "--adaptive",
         default=True,
@@ -83,18 +83,18 @@ if __name__ == "__main__":
     device = torch.device("cuda:7" if torch.cuda.is_available() else "cpu")
 
     # TODO Load the desired dataset
-    # dataset = LoadData(args.fine_classes, args.crop_size, args.batch_size, args.threads)
-    dataset = CifarHundred(args.fine_classes, args.crop_size, args.batch_size, args.threads)
+    # dataset = LoadData(args.use_fine_classes, args.crop_size, args.batch_size, args.threads)
+    dataset = CifarHundred(args.use_fine_classes, args.crop_size, args.batch_size, args.threads)
 
     model_filename = str(
         Path.cwd()
         / "output"
-        / f"model_fine{args.fine_classes}_crop{args.crop_size}_width{args.width_factor}_depth{args.depth}"
+        / f"model_fine{args.use_fine_classes}_crop{args.crop_size}_width{args.width_factor}_depth{args.depth}"
     )
 
     log = Log(log_each=10)
 
-    if args.fine_classes:
+    if args.use_fine_classes:
         model = WideResNet(
             args.depth, args.width_factor, args.dropout, in_channels=3, labels=100
         ).to(device)

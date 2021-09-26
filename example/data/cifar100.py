@@ -1,17 +1,20 @@
-import numpy as np
+import random
 import pickle
+import argparse
+import numpy as np
+from pathlib import Path
 
 import torch
 import torchvision
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
 
-from utility.cutout import Cutout
-from utility.cifar_utils import fine_classes, coarse_classes, coarse_idxs, coarse_classes_map
+from example.utility.cutout import Cutout
+from example.utility.cifar_utils import fine_classes, coarse_classes, coarse_idxs, coarse_classes_map
 
 
 class CifarHundred:
-    def __init__(self, fine_classes, crop_size, batch_size, threads):
+    def __init__(self, use_fine_classes, crop_size, batch_size, threads):
         mean, std = self._get_statistics()
 
         train_transform = transforms.Compose(
@@ -35,7 +38,7 @@ class CifarHundred:
             root="./datasets/cifar100", train=False, download=True, transform=test_transform
         )
 
-        if fine_classes:
+        if use_fine_classes:
             self.classes = fine_classes
         else:
             self.classes = coarse_classes
@@ -65,12 +68,13 @@ class CifarHundred:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+    parser.add_argument("--fine_classes", dest='use_fine_classes', action='store_true')
     parser.add_argument(
-        "--fine_classes",
-        default=True,
-        type=bool,
-        help="True to use CIFAR100 fine granularity, False for coarse class granularity.",
+        "--coarse_classes",
+        dest='use_fine_classes',
+        action='store_false',
     )
+    parser.set_defaults(use_fine_classes=True)
     parser.add_argument(
         "--crop_size",
         default=32,
@@ -90,15 +94,15 @@ if __name__ == "__main__":
 
     print(args)
 
-    initialize(args, seed=42)
+    random.seed(42)
     device = torch.device("cuda:7" if torch.cuda.is_available() else "cpu")
 
-    dataset = CifarHundred(args.fine_classes, args.crop_size, args.batch_size, args.threads)
+    dataset = CifarHundred(args.use_fine_classes, args.crop_size, args.batch_size, args.threads)
     dataset_filename = str(
         Path.cwd()
         / "datasets"
         / "cifar100"
-        / f"cifar100data_fine{args.fine_classes}_crop{args.crop_size}_batch{args.batch_size}_threads{args.threads}.pkl"
+        / f"cifar100data_fine{args.use_fine_classes}_crop{args.crop_size}_batch{args.batch_size}_threads{args.threads}.pkl"
     )
     dataset_file = open(dataset_filename, 'wb')
 
