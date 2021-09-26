@@ -6,8 +6,8 @@ import torchvision
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
 
-from utility.cutout import Cutout
-from utility.cifar_utils import fine_labels, coarse_labels, coarse_idxs, coarse_label_map
+from example.utility.cutout import Cutout
+from example.utility.cifar_utils import fine_labels, coarse_labels, coarse_idxs, coarse_label_map
 
 
 class CifarHundred:
