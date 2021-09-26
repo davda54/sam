@@ -19,13 +19,13 @@ from sam import SAM
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--fine_labels", dest='fine_labels', action='store_true')
+    parser.add_argument("--fine_classes", dest='fine_classes', action='store_true')
     parser.add_argument(
-        "--coarse_labels",
-        dest='fine_labels',
+        "--coarse_classes",
+        dest='fine_classes',
         action='store_false',
     )
-    parser.set_defaults(fine_labels=True)
+    parser.set_defaults(fine_classes=True)
     parser.add_argument(
         "--adaptive",
         default=True,
