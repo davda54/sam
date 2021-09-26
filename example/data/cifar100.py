@@ -7,11 +7,11 @@ import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
 
 from utility.cutout import Cutout
-from utility.cifar_utils import fine_labels, coarse_labels, coarse_idxs, coarse_label_map
+from utility.cifar_utils import fine_classes, coarse_classes, coarse_idxs, coarse_classes_map
 
 
 class CifarHundred:
-    def __init__(self, fine_labels, crop_size, batch_size, threads):
+    def __init__(self, fine_classes, crop_size, batch_size, threads):
         mean, std = self._get_statistics()
 
         train_transform = transforms.Compose(
@@ -35,14 +35,14 @@ class CifarHundred:
             root="./datasets/cifar100", train=False, download=True, transform=test_transform
         )
 
-        if fine_labels:
-            self.classes = fine_labels
+        if fine_classes:
+            self.classes = fine_classes
         else:
             self.classes = coarse_classes
             train_set.classes, test_set.classes = coarse_classes, coarse_classes
             train_set.class_to_idx, test_set.class_to_idx = coarse_idxs, coarse_idxs
-            train_set.targets = list(map(coarse_label_map.get, train_set.targets))
-            test_set.targets = list(map(coarse_label_map.get, test_set.targets))
+            train_set.targets = list(map(coarse_classes_map.get, train_set.targets))
+            test_set.targets = list(map(coarse_classes_map.get, test_set.targets))
 
         self.train = torch.utils.data.DataLoader(
             train_set, batch_size=batch_size, shuffle=True, num_workers=threads
@@ -66,7 +66,7 @@ class CifarHundred:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--fine_labels",
+        "--fine_classes",
         default=True,
         type=bool,
         help="True to use CIFAR100 fine granularity, False for coarse class granularity.",

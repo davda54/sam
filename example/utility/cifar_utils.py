@@ -128,7 +128,7 @@ coarse_classes = (
 
 coarse_idxs = dict([L[::-1] for L in enumerate(coarse_classes)])
 
-coarse_label_key = np.array([ 4,  1, 14,  8,  0,  6,  7,  7, 18,  3,
+coarse_classes_key = np.array([ 4,  1, 14,  8,  0,  6,  7,  7, 18,  3,
                                3, 14,  9, 18,  7, 11,  3,  9,  7, 11,
                                6, 11,  5, 10,  7,  6, 13, 15,  3, 15,
                                0, 11,  1, 10, 12, 14, 16,  9, 11,  5,
@@ -139,4 +139,4 @@ coarse_label_key = np.array([ 4,  1, 14,  8,  0,  6,  7,  7, 18,  3,
                               16, 19,  2,  4,  6, 19,  5,  5,  8, 19,
                               18,  1,  2, 15,  6,  0, 17,  8, 14, 13])
 
-coarse_label_map = dict(enumerate(coarse_label_key))
+coarse_classes_map = dict(enumerate(coarse_classes_key))
