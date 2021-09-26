@@ -10,7 +10,7 @@ from utility.step_lr import StepLR
 from utility.bypass_bn import enable_running_stats, disable_running_stats
 
 import sys
-
+import numpy as np
 from pathlib import Path
 
 sys.path.append("..")
@@ -30,6 +30,12 @@ if __name__ == "__main__":
         default=True,
         type=bool,
         help="True if you want to use the Adaptive SAM.",
+    )
+    parser.add_argument(
+        "--crop_size",
+        default=32,
+        type=int,
+        help="Crop size used in data transformations.",
     )
     parser.add_argument(
         "--batch_size",
@@ -75,17 +81,19 @@ if __name__ == "__main__":
     initialize(args, seed=42)
     device = torch.device("cuda:7" if torch.cuda.is_available() else "cpu")
 
-    dataset = CifarHundred(args.batch_size, args.threads, args.fine_labels)
+    # TODO Load the desired dataset
+    # dataset = LoadData(args.fine_classes, args.crop_size, args.batch_size, args.threads)
+    dataset = CifarHundred(args.fine_classes, args.crop_size, args.batch_size, args.threads)
 
     model_filename = str(
         Path.cwd()
         / "output"
-        / f"model_fine{args.fine_labels}_width{args.width_factor}_depth{args.depth}"
+        / f"model_fine{args.fine_classes}_crop{args.crop_size}_width{args.width_factor}_depth{args.depth}"
     )
 
     log = Log(log_each=10)
 
-    if args.fine_labels:
+    if args.fine_classes:
         model = WideResNet(
             args.depth, args.width_factor, args.dropout, in_channels=3, labels=100
         ).to(device)
