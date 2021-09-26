@@ -1,4 +1,5 @@
 import argparse
+import numpy as np
 import torch
 
 from model.wide_res_net import WideResNet
@@ -10,7 +11,6 @@ from utility.step_lr import StepLR
 from utility.bypass_bn import enable_running_stats, disable_running_stats
 
 import sys
-import numpy as np
 from pathlib import Path
 
 sys.path.append("..")
@@ -19,12 +19,13 @@ from sam import SAM
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+    parser.add_argument("--fine_labels", dest='fine_labels', action='store_true')
     parser.add_argument(
-        "--fine_labels",
-        default=True,
-        type=bool,
-        help="True to use CIFAR100 fine granularity, False for coarse class granularity.",
+        "--coarse_labels",
+        dest='fine_labels',
+        action='store_false',
     )
+    parser.set_defaults(fine_labels=True)
     parser.add_argument(
         "--adaptive",
         default=True,
@@ -150,13 +151,13 @@ if __name__ == "__main__":
                 loss = smooth_crossentropy(predictions, targets)
                 correct = torch.argmax(predictions, 1) == targets
                 log(model, loss.cpu(), correct.cpu())
-                if correct > best_correct:
-                    best_correct = correct
-                    torch.save({
-                        'epoch': epoch,
-                        'model_state_dict': model.state_dict(),
-                        'optimizer_state_dict': optimizer.state_dict(),
-                        'loss': loss.cpu()
-                    }, model_filename)
+
+    model_filename = str(
+        Path.cwd()
+        / "output"
+        / f"model_fine{args.fine_labels}_width{args.width_factor}_depth{args.depth}"
+    )
+
+    torch.save(obj=model.state_dict(), f=model_filename)
 
     log.flush()

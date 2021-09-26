@@ -1,3 +1,5 @@
+import numpy as np
+
 fine_classes = (
     "apple",
     "aquarium_fish",
