@@ -1,4 +1,4 @@
-fine_labels = (
+fine_classes = (
     "apple",
     "aquarium_fish",
     "baby",
@@ -101,7 +101,7 @@ fine_labels = (
     "worm",
 )
 
-coarse_labels = (
+coarse_classes = (
     "aquatic_mammals",
     "fish",
     "flowers",
@@ -124,7 +124,7 @@ coarse_labels = (
     "vehicles_2",
 )
 
-coarse_idxs = dict([L[::-1] for L in enumerate(coarse_labels)])
+coarse_idxs = dict([L[::-1] for L in enumerate(coarse_classes)])
 
 coarse_label_key = np.array([ 4,  1, 14,  8,  0,  6,  7,  7, 18,  3,
                                3, 14,  9, 18,  7, 11,  3,  9,  7, 11,

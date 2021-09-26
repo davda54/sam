@@ -25,10 +25,10 @@ class CifarTen:
         )
 
         train_set = torchvision.datasets.CIFAR10(
-            root="./data", train=True, download=True, transform=train_transform
+            root="./datasets", train=True, download=True, transform=train_transform
         )
         test_set = torchvision.datasets.CIFAR10(
-            root="./data", train=False, download=True, transform=test_transform
+            root="./datasets", train=False, download=True, transform=test_transform
         )
 
         self.train = torch.utils.data.DataLoader(
