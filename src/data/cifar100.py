@@ -9,8 +9,8 @@ import torchvision
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
 
-from example.utility.cutout import Cutout
-from example.utility.cifar_utils import fine_classes, coarse_classes, coarse_idxs, coarse_classes_map
+from src.utility.cutout import Cutout
+from src.utility.cifar_utils import fine_classes, coarse_classes, coarse_idxs, coarse_classes_map
 
 
 class CifarHundred:
