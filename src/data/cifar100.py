@@ -90,7 +90,7 @@ def export_dataset(obj: CifarHundred, split: str):
     )
     print(f"saving {filename}")
     file = open(filename, "wb")
-    output = getattr(obj, split).copy()
+    output = getattr(obj, split)
     print(output)
     pickle.dump(output, file)
     file.close()
