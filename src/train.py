@@ -3,14 +3,13 @@ import torch
 
 from model.wide_res_net import WideResNet
 from model.smooth_cross_entropy import smooth_crossentropy
-from data.cifar100 import CifarHundred
+from data.cifar100 import CifarHundred, load_dataset
 from utility.log import Log
 from utility.initialize import initialize
 from utility.step_lr import StepLR
 from utility.bypass_bn import enable_running_stats, disable_running_stats
 from utility.utils import get_project_root
 import sys
-from pathlib import Path
 
 sys.path.append("")
 from sam import SAM
@@ -18,11 +17,9 @@ from sam import SAM
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--fine_classes", dest='use_fine_classes', action='store_true')
+    parser.add_argument("--fine_classes", dest="use_fine_classes", action="store_true")
     parser.add_argument(
-        "--coarse_classes",
-        dest='use_fine_classes',
-        action='store_false',
+        "--coarse_classes", dest="use_fine_classes", action="store_false",
     )
     parser.set_defaults(use_fine_classes=True)
     parser.add_argument(
@@ -81,9 +78,13 @@ if __name__ == "__main__":
     initialize(args, seed=42)
     device = torch.device("cuda:7" if torch.cuda.is_available() else "cpu")
 
-    # TODO Load the desired dataset
-    # dataset = LoadData(args.use_fine_classes, args.crop_size, args.batch_size, args.threads)
-    dataset = CifarHundred(args.use_fine_classes, args.crop_size, args.batch_size, args.threads)
+    dataset_train = load_dataset(
+        "train", args.use_fine_classes, args.crop_size, args.batch_size, args.threads
+    )
+    dataset_test = load_dataset(
+        "train", args.use_fine_classes, args.crop_size, args.batch_size, args.threads
+    )
+    # dataset = CifarHundred(args.use_fine_classes, args.crop_size, args.batch_size, args.threads)
 
     model_filename = str(
         get_project_root()
@@ -116,9 +117,9 @@ if __name__ == "__main__":
 
     for epoch in range(args.epochs):
         model.train()
-        log.train(len_dataset=len(dataset.train))
+        log.train(len_dataset=len(dataset_train))
 
-        for batch in dataset.train:
+        for batch in dataset_train:
             inputs, targets = (b.to(device) for b in batch)
 
             # first forward-backward step
@@ -139,10 +140,10 @@ if __name__ == "__main__":
                 scheduler(epoch)
 
         model.eval()
-        log.eval(len_dataset=len(dataset.test))
+        log.eval(len_dataset=len(dataset_test))
 
         with torch.no_grad():
-            for batch in dataset.test:
+            for batch in dataset_test:
                 inputs, targets = (b.to(device) for b in batch)
 
                 predictions = model(inputs)
@@ -150,6 +151,7 @@ if __name__ == "__main__":
                 correct = torch.argmax(predictions, 1) == targets
                 log(model, loss.cpu(), correct.cpu())
 
+        # TODO save the model based on the lowest validation loss
         torch.save(model.state_dict(), model_filename)
 
     log.flush()
