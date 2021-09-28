@@ -157,6 +157,11 @@ if __name__ == "__main__":
                 log(model, loss.cpu(), correct.cpu())
 
         # TODO Save the model based on the lowest validation loss
-        torch.save(model.state_dict(), model_filename)
+        torch.save({
+            'epoch': epoch,
+            'model_state_dict': model.state_dict(),
+            'optimizer_state_dict': optimizer.state_dict(),
+            'loss': loss.cpu()
+        }, model_filename)
 
     log.flush()
