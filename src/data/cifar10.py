@@ -3,7 +3,7 @@ import torchvision
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
 
-from src.utility.cutout import Cutout
+from utility.cutout import Cutout
 
 
 class CifarTen:

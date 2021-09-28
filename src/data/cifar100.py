@@ -1,7 +1,6 @@
 import random
 import pickle
 import argparse
-import numpy as np
 from pathlib import Path
 
 import torch
@@ -9,8 +8,8 @@ import torchvision
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
 
-from src.utility.cutout import Cutout
-from src.utility.cifar_utils import fine_classes, coarse_classes, coarse_idxs, coarse_classes_map
+from utility.cutout import Cutout
+from utility.cifar_utils import fine_classes, coarse_classes, coarse_idxs, coarse_classes_map
 
 
 class CifarHundred:

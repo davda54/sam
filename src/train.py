@@ -1,5 +1,4 @@
 import argparse
-import numpy as np
 import torch
 
 from model.wide_res_net import WideResNet
@@ -13,8 +12,8 @@ from utility.bypass_bn import enable_running_stats, disable_running_stats
 import sys
 from pathlib import Path
 
-sys.path.append("..")
-from src.sam import SAM
+sys.path.append("")
+from sam import SAM
 
 
 if __name__ == "__main__":
