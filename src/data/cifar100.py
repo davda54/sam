@@ -21,6 +21,10 @@ from src.utility.utils import get_project_root
 class CifarHundred:
     def __init__(self, use_fine_classes, crop_size, batch_size, threads):
         mean, std = self._get_statistics()
+        if use_fine_classes:
+            granularity = 'fine'
+        else:
+            granularity = 'coarse'
 
         train_transform = transforms.Compose(
             [
@@ -82,11 +86,15 @@ class CifarHundred:
 def export_dataset(obj: CifarHundred, split: str):
     if split not in ["train", "test"]:
         raise ValueError("split must be 'train' or 'test'")
+    if args.use_fine_classes:
+        granularity = 'fine'
+    else:
+        granularity = 'coarse'
     filename = str(
         get_project_root()
         / "datasets"
         / "CIFAR100"
-        / f"dataset_CIFAR100_{split}_fine{args.use_fine_classes}_crop{args.crop_size}_batch{args.batch_size}_threads{args.threads}.pkl"
+        / f"dataset_CIFAR100_{split}_{granularity}_crop{args.crop_size}_batch{args.batch_size}_threads{args.threads}.pkl"
     )
     print(f"saving {filename}")
     file = open(filename, "wb")
@@ -101,11 +109,15 @@ def load_dataset(
 ):
     if split not in ["train", "test"]:
         raise ValueError("split must be 'train' or 'test'")
+    if use_fine_classes:
+        granularity = 'fine'
+    else:
+        granularity = 'coarse'
     filename = str(
         get_project_root()
         / "datasets"
         / "CIFAR100"
-        / f"dataset_CIFAR100_{split}_fine{str(use_fine_classes)}_crop{str(crop_size)}_batch{str(batch_size)}_threads{str(threads)}.pkl"
+        / f"dataset_CIFAR100_{split}_{granularity}_crop{str(crop_size)}_batch{str(batch_size)}_threads{str(threads)}.pkl"
     )
     file = open(filename, "rb")
     dataset = pickle.load(file)

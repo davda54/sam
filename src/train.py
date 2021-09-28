@@ -75,6 +75,11 @@ if __name__ == "__main__":
 
     print(args)
 
+    if args.use_fine_classes:
+        granularity = 'fine'
+    else:
+        granularity = 'coarse'
+
     initialize(args, seed=42)
     device = torch.device("cuda:7" if torch.cuda.is_available() else "cpu")
 
@@ -89,7 +94,7 @@ if __name__ == "__main__":
     model_filename = str(
         get_project_root()
         / "output"
-        / f"model_fine{args.use_fine_classes}_crop{args.crop_size}_width{args.width_factor}_depth{args.depth}"
+        / f"model_{granularity}_crop{args.crop_size}_width{args.width_factor}_depth{args.depth}"
     )
 
     log = Log(log_each=10)
