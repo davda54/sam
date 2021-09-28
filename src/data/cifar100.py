@@ -39,13 +39,13 @@ class CifarHundred:
         )
 
         train_set = torchvision.datasets.CIFAR100(
-            root=str(get_project_root() / "datasets" / "cifar100"),
+            root=str(get_project_root() / "datasets" / "CIFAR100"),
             train=True,
             download=True,
             transform=train_transform,
         )
         test_set = torchvision.datasets.CIFAR100(
-            root=str(get_project_root() / "datasets" / "cifar100"),
+            root=str(get_project_root() / "datasets" / "CIFAR100"),
             train=False,
             download=True,
             transform=test_transform,
@@ -69,7 +69,7 @@ class CifarHundred:
 
     def _get_statistics(self):
         train_set = torchvision.datasets.CIFAR100(
-            root=str(get_project_root() / "datasets" / "cifar100"),
+            root=str(get_project_root() / "datasets" / "CIFAR100"),
             train=True,
             download=True,
             transform=transforms.ToTensor(),
