@@ -8,7 +8,7 @@ from utility.log import Log
 from utility.initialize import initialize
 from utility.step_lr import StepLR
 from utility.bypass_bn import enable_running_stats, disable_running_stats
-
+from utility.utils import get_project_root
 import sys
 from pathlib import Path
 
@@ -86,7 +86,7 @@ if __name__ == "__main__":
     dataset = CifarHundred(args.use_fine_classes, args.crop_size, args.batch_size, args.threads)
 
     model_filename = str(
-        Path.cwd()
+        get_project_root()
         / "output"
         / f"model_fine{args.use_fine_classes}_crop{args.crop_size}_width{args.width_factor}_depth{args.depth}"
     )

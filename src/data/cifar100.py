@@ -16,6 +16,7 @@ from src.utility.cifar_utils import (
     coarse_classes_map,
 )
 
+from src.utility.utils import get_project_root
 
 class CifarHundred:
     def __init__(self, use_fine_classes, crop_size, batch_size, threads):
@@ -38,13 +39,13 @@ class CifarHundred:
         )
 
         train_set = torchvision.datasets.CIFAR100(
-            root=str(Path.cwd() / "datasets" / "cifar100"),
+            root=str(get_project_root() / "datasets" / "cifar100"),
             train=True,
             download=True,
             transform=train_transform,
         )
         test_set = torchvision.datasets.CIFAR100(
-            root=str(Path.cwd() / "datasets" / "cifar100"),
+            root=str(get_project_root() / "datasets" / "cifar100"),
             train=False,
             download=True,
             transform=test_transform,
@@ -68,7 +69,7 @@ class CifarHundred:
 
     def _get_statistics(self):
         train_set = torchvision.datasets.CIFAR100(
-            root=str(Path.cwd() / "datasets" / "cifar100"),
+            root=str(get_project_root() / "datasets" / "cifar100"),
             train=True,
             download=True,
             transform=transforms.ToTensor(),
@@ -82,13 +83,16 @@ def export_dataset(obj: CifarHundred, split: str):
     if split not in ["train", "test"]:
         raise ValueError("split must be 'train' or 'test'")
     filename = str(
-        Path.cwd()
+        get_project_root()
         / "datasets"
         / "cifar100"
         / f"cifar100_{split}_fine{args.use_fine_classes}_crop{args.crop_size}_batch{args.batch_size}_threads{args.threads}.pkl"
     )
+    print(f"saving {filename}")
     file = open(filename, "wb")
-    pickle.dump(getattr(obj, split), file)
+    output = getattr(obj, split).copy()
+    print(output)
+    pickle.dump(output, file)
     file.close()
 
 
@@ -98,7 +102,7 @@ def load_dataset(
     if split not in ["train", "test"]:
         raise ValueError("split must be 'train' or 'test'")
     filename = str(
-        Path.cwd()
+        get_project_root()
         / "datasets"
         / "cifar100"
         / f"cifar100_{split}_fine{str(use_fine_classes)}_crop{str(crop_size)}_batch{str(batch_size)}_threads{str(threads)}.pkl"
