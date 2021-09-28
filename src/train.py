@@ -12,7 +12,7 @@ from utility.utils import get_project_root
 import sys
 
 sys.path.append("")
-from sam import SAM
+from src.sam import SAM
 
 
 if __name__ == "__main__":

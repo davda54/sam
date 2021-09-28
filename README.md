@@ -27,7 +27,7 @@ This is an **unofficial** repository for [Sharpness-Aware Minimization for Effic
 It should be straightforward to use SAM in your training pipeline. Just keep in mind that the training will run twice as slow, because SAM needs two forward-backward passes to estime the "sharpness-aware" gradient. If you're using gradient clipping, make sure to change only the magnitude of gradients, not their direction.
 
 ```python
-from sam import SAM
+from src.sam import SAM
 
 ...
 
@@ -53,7 +53,7 @@ for input, output in data:
 **Alternative usage with a single closure-based `step` function**. This alternative offers similar API to native PyTorch optimizers like LBFGS (kindly suggested by [@rmcavoy](https://github.com/rmcavoy)):
 
 ```python
-from sam import SAM
+from src.sam import SAM
 
 ...
 
