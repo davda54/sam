@@ -38,13 +38,13 @@ class CifarHundred:
         )
 
         train_set = torchvision.datasets.CIFAR100(
-            root=str(Path.cwd()/"datasets"/"cifar100"),
+            root=str(Path.cwd() / "datasets" / "cifar100"),
             train=True,
             download=True,
             transform=train_transform,
         )
         test_set = torchvision.datasets.CIFAR100(
-            root=str(Path.cwd()/"datasets"/"cifar100"),
+            root=str(Path.cwd() / "datasets" / "cifar100"),
             train=False,
             download=True,
             transform=test_transform,
@@ -68,7 +68,7 @@ class CifarHundred:
 
     def _get_statistics(self):
         train_set = torchvision.datasets.CIFAR100(
-            root=str(Path.cwd()/"datasets"/"cifar100"),
+            root=str(Path.cwd() / "datasets" / "cifar100"),
             train=True,
             download=True,
             transform=transforms.ToTensor(),
@@ -90,6 +90,23 @@ def export_dataset(obj: CifarHundred, split: str):
     file = open(filename, "wb")
     pickle.dump(getattr(obj, split), file)
     file.close()
+
+
+def load_dataset(
+    split: str, use_fine_classes: bool, crop_size: int, batch_size: int, threads: int
+):
+    if split not in ["train", "test"]:
+        raise ValueError("split must be 'train' or 'test'")
+    filename = str(
+        Path.cwd()
+        / "datasets"
+        / "cifar100"
+        / f"cifar100_{split}_fine{str(use_fine_classes)}_crop{str(crop_size)}_batch{str(batch_size)}_threads{str(threads)}.pkl"
+    )
+    file = open(filename, "rb")
+    dataset = pickle.load(file)
+    file.close()
+    return dataset
 
 
 if __name__ == "__main__":
@@ -126,3 +143,9 @@ if __name__ == "__main__":
     )
     export_dataset(dataset, "train")
     export_dataset(dataset, "test")
+    train = load_dataset(
+        "train", args.use_fine_classes, args.crop_size, args.batch_size, args.threads
+    )
+    test = load_dataset(
+        "test", args.use_fine_classes, args.crop_size, args.batch_size, args.threads
+    )
