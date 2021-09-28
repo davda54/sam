@@ -8,8 +8,13 @@ import torchvision
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
 
-from utility.cutout import Cutout
-from utility.cifar_utils import fine_classes, coarse_classes, coarse_idxs, coarse_classes_map
+from src.utility.cutout import Cutout
+from src.utility.cifar_utils import (
+    fine_classes,
+    coarse_classes,
+    coarse_idxs,
+    coarse_classes_map,
+)
 
 
 class CifarHundred:
@@ -18,7 +23,9 @@ class CifarHundred:
 
         train_transform = transforms.Compose(
             [
-                torchvision.transforms.RandomCrop(size=(crop_size, crop_size), padding=4),
+                torchvision.transforms.RandomCrop(
+                    size=(crop_size, crop_size), padding=4
+                ),
                 torchvision.transforms.RandomHorizontalFlip(),
                 transforms.ToTensor(),
                 transforms.Normalize(mean, std),
@@ -31,10 +38,16 @@ class CifarHundred:
         )
 
         train_set = torchvision.datasets.CIFAR100(
-            root="./datasets/cifar100", train=True, download=True, transform=train_transform
+            root="./datasets/cifar100",
+            train=True,
+            download=True,
+            transform=train_transform,
         )
         test_set = torchvision.datasets.CIFAR100(
-            root="./datasets/cifar100", train=False, download=True, transform=test_transform
+            root="./datasets/cifar100",
+            train=False,
+            download=True,
+            transform=test_transform,
         )
 
         if use_fine_classes:
@@ -52,6 +65,7 @@ class CifarHundred:
         self.test = torch.utils.data.DataLoader(
             test_set, batch_size=batch_size, shuffle=False, num_workers=threads
         )
+
     def _get_statistics(self):
         train_set = torchvision.datasets.CIFAR100(
             root="./datasets/cifar100",
@@ -64,14 +78,25 @@ class CifarHundred:
         return data.mean(dim=[0, 2, 3]), data.std(dim=[0, 2, 3])
 
 
+def export_dataset(obj: CifarHundred, split: str):
+    if split not in ["train", "test"]:
+        raise ValueError("split must be 'train' or 'test'")
+    filename = str(
+        Path.cwd()
+        / "datasets"
+        / "cifar100"
+        / f"cifar100_{split}_fine{args.use_fine_classes}_crop{args.crop_size}_batch{args.batch_size}_threads{args.threads}.pkl"
+    )
+    file = open(filename, "wb")
+    pickle.dump(obj.train, file)
+    file.close()
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--fine_classes", dest='use_fine_classes', action='store_true')
+    parser.add_argument("--fine_classes", dest="use_fine_classes", action="store_true")
     parser.add_argument(
-        "--coarse_classes",
-        dest='use_fine_classes',
-        action='store_false',
+        "--coarse_classes", dest="use_fine_classes", action="store_false",
     )
     parser.set_defaults(use_fine_classes=True)
     parser.add_argument(
@@ -96,14 +121,8 @@ if __name__ == "__main__":
     random.seed(42)
     device = torch.device("cuda:7" if torch.cuda.is_available() else "cpu")
 
-    dataset = CifarHundred(args.use_fine_classes, args.crop_size, args.batch_size, args.threads)
-    dataset_filename = str(
-        Path.cwd()
-        / "datasets"
-        / "cifar100"
-        / f"cifar100data_fine{args.use_fine_classes}_crop{args.crop_size}_batch{args.batch_size}_threads{args.threads}.pkl"
+    dataset = CifarHundred(
+        args.use_fine_classes, args.crop_size, args.batch_size, args.threads
     )
-    dataset_file = open(dataset_filename, 'wb')
-
-    pickle.dump(dataset, dataset_file)
-    dataset_file.close()
+    export_dataset(dataset, "train")
+    export_dataset(dataset, "test")
