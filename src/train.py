@@ -151,7 +151,7 @@ if __name__ == "__main__":
                 correct = torch.argmax(predictions, 1) == targets
                 log(model, loss.cpu(), correct.cpu())
 
-        # TODO save the model based on the lowest validation loss
+        # TODO Save the model based on the lowest validation loss
         torch.save(model.state_dict(), model_filename)
 
     log.flush()

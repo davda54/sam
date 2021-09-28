@@ -85,8 +85,8 @@ def export_dataset(obj: CifarHundred, split: str):
     filename = str(
         get_project_root()
         / "datasets"
-        / "cifar100"
-        / f"cifar100_{split}_fine{args.use_fine_classes}_crop{args.crop_size}_batch{args.batch_size}_threads{args.threads}.pkl"
+        / "CIFAR100"
+        / f"dataset_CIFAR100_{split}_fine{args.use_fine_classes}_crop{args.crop_size}_batch{args.batch_size}_threads{args.threads}.pkl"
     )
     print(f"saving {filename}")
     file = open(filename, "wb")
@@ -104,8 +104,8 @@ def load_dataset(
     filename = str(
         get_project_root()
         / "datasets"
-        / "cifar100"
-        / f"cifar100_{split}_fine{str(use_fine_classes)}_crop{str(crop_size)}_batch{str(batch_size)}_threads{str(threads)}.pkl"
+        / "CIFAR100"
+        / f"dataset_CIFAR100_{split}_fine{str(use_fine_classes)}_crop{str(crop_size)}_batch{str(batch_size)}_threads{str(threads)}.pkl"
     )
     file = open(filename, "rb")
     dataset = pickle.load(file)
