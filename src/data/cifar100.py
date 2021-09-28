@@ -1,7 +1,6 @@
 import random
 import pickle
 import argparse
-from pathlib import Path
 
 import torch
 import torchvision
@@ -57,12 +56,21 @@ class CifarHundred:
 
         if use_fine_classes:
             self.classes = fine_classes
+
+            # GOAL: Save 20 datasets of fine_classed data based on their coarse classes
+            # make it a function because it needs to run on both train & test
+            train_set # dataset has 100 fine_classes
+            for i in range(20): # there are 20 classes
+                pass
+
         else:
             self.classes = coarse_classes
             train_set.classes, test_set.classes = coarse_classes, coarse_classes
             train_set.class_to_idx, test_set.class_to_idx = coarse_idxs, coarse_idxs
             train_set.targets = list(map(coarse_classes_map.get, train_set.targets))
             test_set.targets = list(map(coarse_classes_map.get, test_set.targets))
+
+        # TODO: saving here with torch
 
         self.train = torch.utils.data.DataLoader(
             train_set, batch_size=batch_size, shuffle=True, num_workers=threads

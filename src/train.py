@@ -1,6 +1,6 @@
 import argparse
 import torch
-
+import numpy as np
 from model.wide_res_net import WideResNet
 from model.smooth_cross_entropy import smooth_crossentropy
 from data.cifar100 import CifarHundred, load_dataset
@@ -120,6 +120,7 @@ if __name__ == "__main__":
     )
     scheduler = StepLR(optimizer, args.learning_rate, args.epochs)
 
+    lowest_loss = np.inf
     for epoch in range(args.epochs):
         model.train()
         log.train(len_dataset=len(dataset_train))
@@ -146,22 +147,30 @@ if __name__ == "__main__":
 
         model.eval()
         log.eval(len_dataset=len(dataset_test))
-
+        epoch_loss = 0
         with torch.no_grad():
             for batch in dataset_test:
                 inputs, targets = (b.to(device) for b in batch)
 
                 predictions = model(inputs)
                 loss = smooth_crossentropy(predictions, targets)
+                batch_loss = loss.cpu()
+                epoch_loss += batch_loss
                 correct = torch.argmax(predictions, 1) == targets
-                log(model, loss.cpu(), correct.cpu())
+                log(model, batch_loss, correct.cpu())
 
         # TODO Save the model based on the lowest validation loss
+        # TODO Confirm my implementation is correct
+        # TODO Check if we want to calculate any other metrics here
+        if epoch_loss < lowest_loss:
+            pass  # save model and assign epoch_loss to lowest_loss
+        else:
+            pass
         torch.save({
             'epoch': epoch,
             'model_state_dict': model.state_dict(),
             'optimizer_state_dict': optimizer.state_dict(),
-            'loss': loss.cpu()
+            'loss': epoch_loss  # TODO Confirm that this works instead of `loss.cpu()`
         }, model_filename)
 
     log.flush()
