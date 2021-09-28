@@ -14,7 +14,7 @@ import sys
 from pathlib import Path
 
 sys.path.append("..")
-from sam import SAM
+from src.sam import SAM
 
 
 if __name__ == "__main__":
