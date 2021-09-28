@@ -38,13 +38,13 @@ class CifarHundred:
         )
 
         train_set = torchvision.datasets.CIFAR100(
-            root="./datasets/cifar100",
+            root=str(Path.cwd()/"datasets"/"cifar100"),
             train=True,
             download=True,
             transform=train_transform,
         )
         test_set = torchvision.datasets.CIFAR100(
-            root="./datasets/cifar100",
+            root=str(Path.cwd()/"datasets"/"cifar100"),
             train=False,
             download=True,
             transform=test_transform,
@@ -68,7 +68,7 @@ class CifarHundred:
 
     def _get_statistics(self):
         train_set = torchvision.datasets.CIFAR100(
-            root="./datasets/cifar100",
+            root=str(Path.cwd()/"datasets"/"cifar100"),
             train=True,
             download=True,
             transform=transforms.ToTensor(),
@@ -88,7 +88,7 @@ def export_dataset(obj: CifarHundred, split: str):
         / f"cifar100_{split}_fine{args.use_fine_classes}_crop{args.crop_size}_batch{args.batch_size}_threads{args.threads}.pkl"
     )
     file = open(filename, "wb")
-    pickle.dump(obj.train, file)
+    pickle.dump(getattr(obj, split), file)
     file.close()
 
 
