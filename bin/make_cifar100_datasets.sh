@@ -2,7 +2,7 @@
 
 for class in fine coarse
 do
-  for cs in 4 8 16
+  for cs in 4 8 16 32
   do
       for bs in 128
       do
