@@ -3,16 +3,17 @@ import torch
 import numpy as np
 from model.wide_res_net import WideResNet
 from model.smooth_cross_entropy import smooth_crossentropy
-from data.cifar100 import CifarHundred, load_dataset
+from data.cifar100 import load_dataset
 from utility.log import Log
 from utility.initialize import initialize
 from utility.step_lr import StepLR
 from utility.bypass_bn import enable_running_stats, disable_running_stats
-from utility.utils import get_project_root
-import sys
-
-sys.path.append("")
+from utility.misc_utils import get_project_root
 from src.sam import SAM
+
+# TODO: Make sure commenting this out does not break anything
+# import sys
+# sys.path.append("")
 
 
 if __name__ == "__main__":
@@ -22,6 +23,9 @@ if __name__ == "__main__":
         "--coarse_classes", dest="use_fine_classes", action="store_false",
     )
     parser.set_defaults(use_fine_classes=True)
+    parser.add_argument(
+        "--superclass", default="All", type=str, help="Superclass we want to use",
+    )
     parser.add_argument(
         "--adaptive",
         default=True,
@@ -76,25 +80,43 @@ if __name__ == "__main__":
     print(args)
 
     if args.use_fine_classes:
-        granularity = 'fine'
+        args.granularity = "Fine"
+        if not args.superclass:
+            ValueError("Must provide superclass when training with fine labels")
+        superclass = str(args.superclass)
     else:
-        granularity = 'coarse'
+        args.granularity = "Coarse"
+        if not args.superclass:
+            superclass = "All"
 
     initialize(args, seed=42)
     device = torch.device("cuda:7" if torch.cuda.is_available() else "cpu")
 
-    dataset_train = load_dataset(
-        "train", args.use_fine_classes, args.crop_size, args.batch_size, args.threads
-    )
-    dataset_test = load_dataset(
-        "train", args.use_fine_classes, args.crop_size, args.batch_size, args.threads
-    )
-    # dataset = CifarHundred(args.use_fine_classes, args.crop_size, args.batch_size, args.threads)
+    dataset_train = load_dataset("train", args)
+    dataset_test = load_dataset("train", args)
 
-    model_filename = str(
+    train_set = torch.utils.data.DataLoader(
+        dataset_train,
+        batch_size=args.batch_size,
+        shuffle=True,
+        num_workers=args.threads,
+    )
+    test_set = torch.utils.data.DataLoader(
+        dataset_test,
+        batch_size=args.batch_size,
+        shuffle=False,
+        num_workers=args.threads,
+    )
+
+    model_fp = str(
         get_project_root()
-        / "output"
-        / f"model_{granularity}_crop{args.crop_size}_width{args.width_factor}_depth{args.depth}"
+        / "models"
+        / args.granularity
+        / str(args.crop_size)
+        / str(args.width_factor)
+        / str(args.depth)
+        / args.superclass
+        / f"model_{args.granularity}_{args.superclass}_crop{args.crop_size}_width{args.width_factor}_depth{args.depth}"
     )
 
     log = Log(log_each=10)
@@ -159,18 +181,16 @@ if __name__ == "__main__":
                 correct = torch.argmax(predictions, 1) == targets
                 log(model, batch_loss, correct.cpu())
 
-        # TODO Save the model based on the lowest validation loss
-        # TODO Confirm my implementation is correct
-        # TODO Check if we want to calculate any other metrics here
         if epoch_loss < lowest_loss:
-            pass  # save model and assign epoch_loss to lowest_loss
-        else:
-            pass
-        torch.save({
-            'epoch': epoch,
-            'model_state_dict': model.state_dict(),
-            'optimizer_state_dict': optimizer.state_dict(),
-            'loss': epoch_loss  # TODO Confirm that this works instead of `loss.cpu()`
-        }, model_filename)
+            lowest_loss = epoch_loss
+            torch.save(
+                {
+                    "epoch": epoch,
+                    "model_state_dict": model.state_dict(),
+                    "optimizer_state_dict": optimizer.state_dict(),
+                    "loss": epoch_loss,  # TODO Confirm that this works instead of `loss.cpu()`
+                },
+                model_fp,
+            )
 
     log.flush()
