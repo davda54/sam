@@ -20,7 +20,7 @@ import sys
 sys.path.append("")
 
 
-def export_dataset(data: torchvision.datasets, split: str, _args):
+def save_dataset(data: torchvision.datasets, split: str, _args):
     if split not in ["train", "test"]:
         raise ValueError("split must be 'train' or 'test'")
     fp = (
@@ -30,7 +30,7 @@ def export_dataset(data: torchvision.datasets, split: str, _args):
         / _args.granularity
         / f"crop_size{str(_args.crop_size)}"
         / _args.superclass
-        / f"dataset_{split}_{_args.granularity}_crop{str(_args.crop_size)}.pt"
+        / f"dataset_{split}_{_args.granularity}_{_args.superclass}_crop{str(_args.crop_size)}.pt"
     )
     fp.parent.mkdir(parents=True, exist_ok=True)
     print(f"Saving: {fp}")
@@ -135,8 +135,8 @@ if __name__ == "__main__":
     random.seed(42)
     train_set, test_set = make_cifar100(args)
 
-    export_dataset(train_set, "train", args)
-    export_dataset(test_set, "test", args)
+    save_dataset(train_set, "train", args)
+    save_dataset(test_set, "test", args)
 
     _train_set_ = load_dataset("train", args)
     assert _train_set_
