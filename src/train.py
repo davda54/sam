@@ -12,8 +12,8 @@ from utility.misc_utils import get_project_root
 from src.sam import SAM
 
 # TODO: Make sure commenting this out does not break anything
-# import sys
-# sys.path.append("")
+import sys
+sys.path.append("")
 
 
 if __name__ == "__main__":

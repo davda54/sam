@@ -15,7 +15,8 @@ from src.utility.cifar_utils import (
 )
 
 from src.utility.misc_utils import get_project_root
-
+import sys
+sys.path.append("")
 
 def export_dataset(data: torchvision.datasets, split: str, _args):
     if split not in ["train", "test"]:
