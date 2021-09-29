@@ -126,7 +126,6 @@ if __name__ == "__main__":
         ValueError("Must provide a specific superclass when working with fine labels")
     elif args.use_fine_classes:
         args.granularity = "Fine"
-        superclass = str(args.superclass)
     else:
         args.granularity = "Coarse"
 
