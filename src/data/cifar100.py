@@ -16,7 +16,9 @@ from src.utility.cifar_utils import (
 
 from src.utility.misc_utils import get_project_root
 import sys
+
 sys.path.append("")
+
 
 def export_dataset(data: torchvision.datasets, split: str, _args):
     if split not in ["train", "test"]:
@@ -123,12 +125,10 @@ if __name__ == "__main__":
     if args.use_fine_classes and args.superclass == "All":
         ValueError("Must provide a specific superclass when working with fine labels")
     elif args.use_fine_classes:
-        granularity = "Fine"
+        args.granularity = "Fine"
         superclass = str(args.superclass)
     else:
-        granularity = "Coarse"
-        if not args.superclass:
-            superclass = "All"
+        args.granularity = "Coarse"
 
     # TODO need to use environmental variables instead of this method to distribute w/ shell commands
     device = torch.device("cuda:7" if torch.cuda.is_available() else "cpu")
