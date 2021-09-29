@@ -12,7 +12,7 @@ predicting range(0 - 19) labels, with 20 neurons
 Export
 
 Stage 2 Zoo: 
-Fine classes remain unchanged
+fine classes remain unchanged
 output 100 neurons, 100 labels
 Split the dataset by the coarse labels (20 subsets)
 training towards fine labels

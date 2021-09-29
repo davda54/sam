@@ -111,7 +111,7 @@ if __name__ == "__main__":
     )
     parser.set_defaults(use_fine_classes=True)
     parser.add_argument(
-        "--superclass", default="All", type=str, help="Superclass we want to use",
+        "--superclass", default="all", type=str, help="Superclass we want to use",
     )
     parser.add_argument(
         "--crop_size",
@@ -122,12 +122,12 @@ if __name__ == "__main__":
     args = parser.parse_args()
     print(args)
 
-    if args.use_fine_classes and args.superclass == "All":
+    if args.use_fine_classes and args.superclass == "all":
         ValueError("Must provide a specific superclass when working with fine labels")
     elif args.use_fine_classes:
-        args.granularity = "Fine"
+        args.granularity = "fine"
     else:
-        args.granularity = "Coarse"
+        args.granularity = "coarse"
 
     # TODO need to use environmental variables instead of this method to distribute w/ shell commands
     device = torch.device("cuda:7" if torch.cuda.is_available() else "cpu")

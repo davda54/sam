@@ -3,7 +3,7 @@
 #classes=("coarse", "fine")
 crop_sizes=(4, 8, 16, 32)
 
-sc=("All")
+sc=("all")
 for class in coarse; do
   for sc in "${superclasses[@]}" in; do
     for cs in "${crop_sizes[@]}"; do

@@ -25,7 +25,7 @@ if __name__ == "__main__":
     )
     parser.set_defaults(use_fine_classes=True)
     parser.add_argument(
-        "--superclass", default="All", type=str, help="Superclass we want to use",
+        "--superclass", default="all", type=str, help="Superclass we want to use",
     )
     parser.add_argument(
         "--adaptive",
@@ -81,14 +81,14 @@ if __name__ == "__main__":
     print(args)
 
     if args.use_fine_classes:
-        args.granularity = "Fine"
+        args.granularity = "fine"
         if not args.superclass:
             ValueError("Must provide superclass when training with fine labels")
         superclass = str(args.superclass)
     else:
-        args.granularity = "Coarse"
+        args.granularity = "coarse"
         if not args.superclass:
-            superclass = "All"
+            superclass = "all"
 
     initialize(args, seed=42)
     device = torch.device("cuda:7" if torch.cuda.is_available() else "cpu")
