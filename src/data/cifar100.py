@@ -32,7 +32,7 @@ def export_dataset(data: torchvision.datasets, split: str, _args):
         / _args.superclass
         / f"dataset_{split}_{_args.granularity}_crop{str(_args.crop_size)}.pt"
     )
-    fp.mkdir(parents=True, exist_ok=True)
+    fp.parent.mkdir(parents=True, exist_ok=True)
     print(f"Saving: {fp}")
     torch.save(data, fp)
 
