@@ -26,10 +26,7 @@ sys.path.append(get_project_root)
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--gpu",
-        default=7,
-        type=int,
-        help="Index value for the GPU to use",
+        "--gpu", default=7, type=int, help="Index value for the GPU to use",
     )
     parser.add_argument("--fine_classes", dest="use_fine_classes", action="store_true")
     parser.add_argument(
@@ -143,11 +140,21 @@ if __name__ == "__main__":
 
     if args.use_fine_classes:
         model = WideResNet(
-            args.depth, args.width_factor, args.dropout, args.kernel_size, in_channels=3, labels=100,
+            depth=args.depth,
+            width_factor=args.width_factor,
+            dropout=args.dropout,
+            kernel_size=args.kernel_size,
+            in_channels=3,
+            labels=100,
         ).to(device)
     else:
         model = WideResNet(
-            args.depth, args.width_factor, args.dropout, args.kernel_size, in_channels=3, labels=20,
+            depth=args.depth,
+            width_factor=args.width_factor,
+            dropout=args.dropout,
+            kernel_size=args.kernel_size,
+            in_channels=3,
+            labels=20,
         ).to(device)
 
     base_optimizer = torch.optim.SGD
