@@ -25,6 +25,12 @@ sys.path.append(get_project_root)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--gpu",
+        default=7,
+        type=int,
+        help="Index value for the GPU to use",
+    )
     parser.add_argument("--fine_classes", dest="use_fine_classes", action="store_true")
     parser.add_argument(
         "--coarse_classes", dest="use_fine_classes", action="store_false",
@@ -97,7 +103,7 @@ if __name__ == "__main__":
             superclass = "all"
 
     initialize(args, seed=42)
-    device = torch.device("cuda:7" if torch.cuda.is_available() else "cpu")
+    device = torch.device(f"cuda:{args.gpu}" if torch.cuda.is_available() else "cpu")
 
     dataset_train = load_dataset("train", args)
     dataset_test = load_dataset("train", args)

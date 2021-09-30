@@ -173,7 +173,9 @@ class WideResNet(nn.Module):
                     ),
                     ("4_normalization", nn.BatchNorm2d(self.filters[3])),
                     ("5_activation", nn.ReLU(inplace=True)),
-                    ("6_pooling", nn.AvgPool2d(kernel_size=8)),
+                    # TODO: "I think you need to print out the output sizes on each layer of the resnet, so you will have better idea how to adjust these kernel sizes given the input images"
+                    # TODO: Make kernel_size an argument
+                    ("6_pooling", nn.AvgPool2d(kernel_size=3)), # default is 8, changed to deal with small sizes
                     ("7_flattening", nn.Flatten()),
                     (
                         "8_classification",
