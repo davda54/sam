@@ -2,9 +2,9 @@
 
 classes="coarse"
 super_classes="all"
-crop_options=(4 8 16 32)
-depth_options=(12 14 16 18 20)
-width_options=(4 6 8 10 12)
+crop_options=(4 8 16)
+depth_options=(16 20 24)
+width_options=(2 4 6 8)
 
 for cl in classes; do
   for sc in super_classes; do
