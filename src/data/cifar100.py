@@ -30,7 +30,6 @@ def save_dataset(data: torchvision.datasets, split: str, _args):
         / _args.granularity
         / _args.superclass
         / f"crop_size{str(_args.crop_size)}"
-        / _args.superclass
         / f"dataset_{split}_{_args.granularity}_{_args.superclass}_crop{str(_args.crop_size)}.pt"
     )
     fp.parent.mkdir(parents=True, exist_ok=True)
