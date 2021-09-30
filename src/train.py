@@ -111,7 +111,7 @@ if __name__ == "__main__":
         num_workers=args.threads,
     )
 
-    model_fp = str(
+    fp = str(
         get_project_root()
         / "models"
         / args.granularity
@@ -121,6 +121,7 @@ if __name__ == "__main__":
         / args.superclass
         / f"model_{args.granularity}_{args.superclass}_crop{args.crop_size}_width{args.width_factor}_depth{args.depth}"
     )
+    fp.parent.mkdir(parents=True, exist_ok=True)
 
     log = Log(log_each=10)
 
@@ -178,11 +179,9 @@ if __name__ == "__main__":
                 inputs, targets = (b.to(device) for b in batch)
                 predictions = model(inputs)
                 loss = smooth_crossentropy(predictions, targets)
-                print("shape: ", loss.shape)
-                print("sum: ", loss.sum().item())
+                # print("shape: ", loss.shape)
+                # print("sum: ", loss.sum().item())
                 batch_loss = loss.sum().item()
-                # print("sum: ", sum(loss))
-                # batch_loss = sum(loss)
                 epoch_loss += batch_loss
                 correct = torch.argmax(predictions, 1) == targets
                 log(model, loss.cpu(), correct.cpu())
@@ -197,7 +196,7 @@ if __name__ == "__main__":
                     "optimizer_state_dict": optimizer.state_dict(),
                     "loss": epoch_loss,  # TODO Confirm that this works instead of `loss.cpu()`
                 },
-                model_fp,
+                fp,
             )
 
     log.flush()
