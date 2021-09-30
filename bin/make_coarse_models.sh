@@ -1,7 +1,7 @@
 #!/bin/sh
 
 crop_options=(4 8 16)
-depth_options=(16 20 24)
+depth_options=(4 8 12 16 20 24)
 width_options=(2 4 6 8)
 kernel_options=(2 3 4)
 
