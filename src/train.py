@@ -111,7 +111,7 @@ if __name__ == "__main__":
         num_workers=args.threads,
     )
 
-    fp = str(
+    fp = (
         get_project_root()
         / "models"
         / args.granularity
@@ -196,7 +196,7 @@ if __name__ == "__main__":
                     "optimizer_state_dict": optimizer.state_dict(),
                     "loss": epoch_loss,  # TODO Confirm that this works instead of `loss.cpu()`
                 },
-                fp,
+                str(fp),
             )
 
     log.flush()
