@@ -28,6 +28,7 @@ def save_dataset(data: torchvision.datasets, split: str, _args):
         / "datasets"
         / split
         / _args.granularity
+        / _args.superclass
         / f"crop_size{str(_args.crop_size)}"
         / _args.superclass
         / f"dataset_{split}_{_args.granularity}_{_args.superclass}_crop{str(_args.crop_size)}.pt"
@@ -45,8 +46,8 @@ def load_dataset(split: str, _args):
         / "datasets"
         / split
         / _args.granularity
-        / f"crop_size{str(_args.crop_size)}"
         / _args.superclass
+        / f"crop_size{str(_args.crop_size)}"
         / f"dataset_{split}_{_args.granularity}_{_args.superclass}_crop{str(_args.crop_size)}.pt"
     )
     dataset = torch.load(fp)
