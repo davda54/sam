@@ -11,11 +11,15 @@ from utility.bypass_bn import enable_running_stats, disable_running_stats
 from sam import SAM
 
 from pathlib import Path
+
+
 def get_project_root() -> Path:
     return Path(__file__).parent.parent
 
+
 # TODO: Make sure commenting this out does not break anything
 import sys
+
 sys.path.append(get_project_root)
 
 
@@ -186,17 +190,19 @@ if __name__ == "__main__":
                 correct = torch.argmax(predictions, 1) == targets
                 log(model, loss.cpu(), correct.cpu())
 
+        log.flush()
+
         if epoch_loss < lowest_loss:
-            print("new lowest loss: ", epoch_loss)
+            print(
+                f"Epoch {epoch} achieved a new lowest_loss of {epoch_loss}. Saving model to disk."
+            )
             lowest_loss = epoch_loss
             torch.save(
                 {
                     "epoch": epoch,
                     "model_state_dict": model.state_dict(),
                     "optimizer_state_dict": optimizer.state_dict(),
-                    "loss": epoch_loss,  # TODO Confirm that this works instead of `loss.cpu()`
+                    "loss": epoch_loss,
                 },
                 str(fp),
             )
-
-    log.flush()
