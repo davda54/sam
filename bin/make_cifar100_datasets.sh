@@ -5,7 +5,7 @@ super_classes=("all")
 for cl in "coarse"; do
   for sc in "${super_classes[@]}"; do
     for cs in "${crop_options[@]}"; do
-      CUDA_VISIBLE_DEVICES=7 python -u -m src.data.cifar100 --${cl}_classes --crop_size $cs \
+      CUDA_VISIBLE_DEVICES=7 python -u  src/cifar100.py --${cl}_classes --crop_size $cs \
       | tee logs/dataset_${cl}_${sc}_crop${cs}.log
     done
   done
@@ -15,7 +15,7 @@ done
 #for cl in "fine"; do
 #  for sc in "${super_classes[@]}"; do
 #    for cs in "${crop_options[@]}"; do
-#      CUDA_VISIBLE_DEVICES=7 python -u src/data/cifar100.py --${cl}_classes --crop_size $cs \
+#      CUDA_VISIBLE_DEVICES=7 python -u src/cifar100.py --${cl}_classes --crop_size $cs \
 #      | tee logs/dataset_${cl}_${sc}_crop${cs}.log
 #    done
 #  done

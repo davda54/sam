@@ -6,8 +6,8 @@ import torchvision
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
 
-from src.utility.cutout import Cutout
-from src.utility.cifar_utils import (
+from utility.cutout import Cutout
+from utility.cifar_utils import (
     coarse_classes,
     coarse_idxs,
     coarse_classes_map,
