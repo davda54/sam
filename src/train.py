@@ -172,17 +172,16 @@ if __name__ == "__main__":
 
         model.eval()
         log.eval(len_dataset=len(test_set))
-        epoch_loss = 0
+        epoch_loss = 0.0
         with torch.no_grad():
             for batch in test_set:
                 inputs, targets = (b.to(device) for b in batch)
-
                 predictions = model(inputs)
                 loss = smooth_crossentropy(predictions, targets)
-                batch_loss = loss.cpu()
+                batch_loss = loss.item()
                 epoch_loss += batch_loss
                 correct = torch.argmax(predictions, 1) == targets
-                log(model, batch_loss, correct.cpu())
+                log(model, loss.cpu(), correct.cpu())
 
         if epoch_loss < lowest_loss:
             lowest_loss = epoch_loss
