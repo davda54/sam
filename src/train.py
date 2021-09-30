@@ -3,7 +3,7 @@ import torch
 import numpy as np
 from model.wide_res_net import WideResNet
 from model.smooth_cross_entropy import smooth_crossentropy
-from data.cifar100 import load_dataset
+from utility.cifar_utils import load_dataset
 from utility.log import Log
 from utility.initialize import initialize
 from utility.step_lr import StepLR

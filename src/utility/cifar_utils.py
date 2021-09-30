@@ -1,4 +1,8 @@
 import numpy as np
+import torch
+import torchvision
+
+from src.utility.misc_utils import get_project_root
 
 fine_classes = (
     "apple",
@@ -234,3 +238,36 @@ coarse_classes_key = np.array(
 )
 
 coarse_classes_map = dict(enumerate(coarse_classes_key))
+
+
+def load_dataset(split: str, _args):
+    if split not in ["train", "test"]:
+        raise ValueError("split must be 'train' or 'test'")
+    fp = (
+        get_project_root()
+        / "datasets"
+        / split
+        / _args.granularity
+        / _args.superclass
+        / f"crop_size{str(_args.crop_size)}"
+        / f"dataset_{split}_{_args.granularity}_{_args.superclass}_crop{str(_args.crop_size)}.pt"
+    )
+    dataset = torch.load(fp)
+    return dataset
+
+
+def save_dataset(data: torchvision.datasets, split: str, _args):
+    if split not in ["train", "test"]:
+        raise ValueError("split must be 'train' or 'test'")
+    fp = (
+        get_project_root()
+        / "datasets"
+        / split
+        / _args.granularity
+        / _args.superclass
+        / f"crop_size{str(_args.crop_size)}"
+        / f"dataset_{split}_{_args.granularity}_{_args.superclass}_crop{str(_args.crop_size)}.pt"
+    )
+    fp.parent.mkdir(parents=True, exist_ok=True)
+    print(f"Saving: {fp}")
+    torch.save(data, fp)

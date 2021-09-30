@@ -8,49 +8,17 @@ from torch.utils.data import DataLoader
 
 from src.utility.cutout import Cutout
 from src.utility.cifar_utils import (
-    fine_classes,
     coarse_classes,
     coarse_idxs,
     coarse_classes_map,
+    load_dataset,
+    save_dataset,
 )
 
 from src.utility.misc_utils import get_project_root
 import sys
 
 sys.path.append("")
-
-
-def save_dataset(data: torchvision.datasets, split: str, _args):
-    if split not in ["train", "test"]:
-        raise ValueError("split must be 'train' or 'test'")
-    fp = (
-        get_project_root()
-        / "datasets"
-        / split
-        / _args.granularity
-        / _args.superclass
-        / f"crop_size{str(_args.crop_size)}"
-        / f"dataset_{split}_{_args.granularity}_{_args.superclass}_crop{str(_args.crop_size)}.pt"
-    )
-    fp.parent.mkdir(parents=True, exist_ok=True)
-    print(f"Saving: {fp}")
-    torch.save(data, fp)
-
-
-def load_dataset(split: str, _args):
-    if split not in ["train", "test"]:
-        raise ValueError("split must be 'train' or 'test'")
-    fp = (
-        get_project_root()
-        / "datasets"
-        / split
-        / _args.granularity
-        / _args.superclass
-        / f"crop_size{str(_args.crop_size)}"
-        / f"dataset_{split}_{_args.granularity}_{_args.superclass}_crop{str(_args.crop_size)}.pt"
-    )
-    dataset = torch.load(fp)
-    return dataset
 
 
 def make_cifar100(parsed_args):
