@@ -148,9 +148,9 @@ if __name__ == "__main__":
     lowest_loss = np.inf
     for epoch in range(args.epochs):
         model.train()
-        log.train(len_dataset=len(dataset_train))
+        log.train(len_dataset=len(train_set))
 
-        for batch in dataset_train:
+        for batch in train_set:
             inputs, targets = (b.to(device) for b in batch)
 
             # first forward-backward step
@@ -171,10 +171,10 @@ if __name__ == "__main__":
                 scheduler(epoch)
 
         model.eval()
-        log.eval(len_dataset=len(dataset_test))
+        log.eval(len_dataset=len(test_set))
         epoch_loss = 0
         with torch.no_grad():
-            for batch in dataset_test:
+            for batch in test_set:
                 inputs, targets = (b.to(device) for b in batch)
 
                 predictions = model(inputs)
