@@ -8,7 +8,7 @@ def get_project_root() -> Path:
     return Path(__file__).parent.parent.parent
 
 
-fine_classes = (
+fine_classes = (  # Strict order DO NOT CHANGE
     "apple",
     "aquarium_fish",
     "baby",
@@ -111,7 +111,7 @@ fine_classes = (
     "worm",
 )
 
-coarse_classes = (
+coarse_classes = (  # Strict order DO NOT CHANGE
     "aquatic_mammals",
     "fish",
     "flowers",
@@ -134,9 +134,55 @@ coarse_classes = (
     "vehicles_2",
 )
 
+coarse_idx_to_class = { # Strict order DO NOT CHANGE
+    0: "aquatic_mammals",
+    1: "fish",
+    2: "flowers",
+    3: "food_containers",
+    4: "fruit_and_vegetables",
+    5: "household_electrical_devices",
+    6: "household_furniture",
+    7: "insects",
+    8: "large_carnivores",
+    9: "large_man-made_outdoor_things",
+    10: "large_natural_outdoor_scenes",
+    11: "large_omnivores_and_herbivores",
+    12: "medium_mammals",
+    13: "non-insect_invertebrates",
+    14: "people",
+    15: "reptiles",
+    16: "small_mammals",
+    17: "trees",
+    18: "vehicles_1",
+    19: "vehicles_2",
+}
+
+coarse_class_to_idx = { # Strict order DO NOT CHANGE
+    "aquatic_mammals": 0,
+    "fish": 1,
+    "flowers": 2,
+    "food_containers": 3,
+    "fruit_and_vegetables": 4,
+    "household_electrical_devices": 5,
+    "household_furniture": 6,
+    "insects": 7,
+    "large_carnivores": 8,
+    "large_man-made_outdoor_things": 9,
+    "large_natural_outdoor_scenes": 10,
+    "large_omnivores_and_herbivores": 11,
+    "medium_mammals": 12,
+    "non-insect_invertebrates": 13,
+    "people": 14,
+    "reptiles": 15,
+    "small_mammals": 16,
+    "trees": 17,
+    "vehicles_1": 18,
+    "vehicles_2": 19,
+}
+
 coarse_idxs = dict([L[::-1] for L in enumerate(coarse_classes)])
 
-coarse_classes_key = np.array(
+fine_idx_to_coarse = np.array( # Strict order DO NOT CHANGE
     [
         4,
         1,
@@ -241,7 +287,7 @@ coarse_classes_key = np.array(
     ]
 )
 
-coarse_classes_map = dict(enumerate(coarse_classes_key))
+fine_to_coarse_idxs = dict(enumerate(fine_idx_to_coarse)) # Strict order DO NOT CHANGE
 
 
 def load_dataset(split: str, _args):
