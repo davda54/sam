@@ -9,7 +9,13 @@ for kr in "${kernel_options[@]}"; do
   for cr in "${crop_options[@]}"; do
     for dp in "${depth_options[@]}"; do
       for wd in "${width_options[@]}"; do
-        python -u src/train.py --gpu 7 --coarse_classes --crop_size $cr --depth $dp --width_factor $wd  --kernel_size $kr \
+        python -u src/train.py \
+        --gpu 7 \
+        --coarse_classes \
+        --crop_size $cr \
+        --kernel_size $kr \
+        --depth $dp \
+        --width_factor $wd  \
         | tee logs/model_coarse_all_crop${cr}_kernel${kr}_depth${dp}_width${wd}.log
       done
     done
