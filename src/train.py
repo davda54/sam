@@ -8,7 +8,7 @@ from utility.log import Log
 from utility.initialize import initialize
 from utility.step_lr import StepLR
 from utility.bypass_bn import enable_running_stats, disable_running_stats
-from src.sam import SAM
+from sam import SAM
 
 from pathlib import Path
 def get_project_root() -> Path:
