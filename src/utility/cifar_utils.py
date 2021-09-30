@@ -1,8 +1,10 @@
 import numpy as np
 import torch
 import torchvision
+from pathlib import Path
 
-from src.utility.misc_utils import get_project_root
+def get_project_root() -> Path:
+    return Path(__file__).parent.parent.parent
 
 fine_classes = (
     "apple",

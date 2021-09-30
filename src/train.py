@@ -8,13 +8,15 @@ from utility.log import Log
 from utility.initialize import initialize
 from utility.step_lr import StepLR
 from utility.bypass_bn import enable_running_stats, disable_running_stats
-from utility.misc_utils import get_project_root
 from src.sam import SAM
+
+from pathlib import Path
+def get_project_root() -> Path:
+    return Path(__file__).parent.parent
 
 # TODO: Make sure commenting this out does not break anything
 import sys
-
-sys.path.append("")
+sys.path.append(get_project_root)
 
 
 if __name__ == "__main__":
