@@ -143,11 +143,11 @@ if __name__ == "__main__":
 
     if args.use_fine_classes:
         model = WideResNet(
-            args.depth, args.width_factor, args.dropout, in_channels=3, labels=100, args.kernel_size
+            args.depth, args.width_factor, args.dropout, args.kernel_size, in_channels=3, labels=100,
         ).to(device)
     else:
         model = WideResNet(
-            args.depth, args.width_factor, args.dropout, in_channels=3, labels=20, args.kernel_size
+            args.depth, args.width_factor, args.dropout, args.kernel_size, in_channels=3, labels=20,
         ).to(device)
 
     base_optimizer = torch.optim.SGD
