@@ -52,6 +52,12 @@ if __name__ == "__main__":
         help="Crop size used in data transformations.",
     )
     parser.add_argument(
+        "--kernel_size",
+        default=3,
+        type=int,
+        help="Kernel size for max pooling layer in WideResNet",
+    )
+    parser.add_argument(
         "--batch_size",
         default=128,
         type=int,
@@ -129,7 +135,7 @@ if __name__ == "__main__":
         / str(args.width_factor)
         / str(args.depth)
         / args.superclass
-        / f"model_{args.granularity}_{args.superclass}_crop{args.crop_size}_width{args.width_factor}_depth{args.depth}"
+        / f"model_{args.granularity}_{args.superclass}_crop{args.crop_size}_kernel{args.kernel_size}_width{args.width_factor}_depth{args.depth}"
     )
     fp.parent.mkdir(parents=True, exist_ok=True)
 
@@ -137,11 +143,11 @@ if __name__ == "__main__":
 
     if args.use_fine_classes:
         model = WideResNet(
-            args.depth, args.width_factor, args.dropout, in_channels=3, labels=100
+            args.depth, args.width_factor, args.dropout, in_channels=3, labels=100, args.kernel_size
         ).to(device)
     else:
         model = WideResNet(
-            args.depth, args.width_factor, args.dropout, in_channels=3, labels=20
+            args.depth, args.width_factor, args.dropout, in_channels=3, labels=20, args.kernel_size
         ).to(device)
 
     base_optimizer = torch.optim.SGD
