@@ -178,12 +178,17 @@ if __name__ == "__main__":
                 inputs, targets = (b.to(device) for b in batch)
                 predictions = model(inputs)
                 loss = smooth_crossentropy(predictions, targets)
-                batch_loss = loss.item()
+                print("shape: ", loss.shape)
+                print("sum: ", loss.sum().item())
+                batch_loss = loss.sum().item()
+                # print("sum: ", sum(loss))
+                # batch_loss = sum(loss)
                 epoch_loss += batch_loss
                 correct = torch.argmax(predictions, 1) == targets
                 log(model, loss.cpu(), correct.cpu())
 
         if epoch_loss < lowest_loss:
+            print("new lowest loss: ", epoch_loss)
             lowest_loss = epoch_loss
             torch.save(
                 {
