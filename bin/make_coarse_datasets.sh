@@ -1,7 +1,7 @@
 #!/bin/sh
 
-classes="coarse"
-super_classes="all"
+classes=("coarse")
+super_classes=("all")
 crop_options=(4 8 16 32)
 
 for cl in classes; do
