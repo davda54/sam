@@ -15,7 +15,7 @@ from utility.cifar_utils import (
     save_dataset,
 )
 
-from src.utility.misc_utils import get_project_root
+from utility.misc_utils import get_project_root
 import sys
 
 sys.path.append("")
