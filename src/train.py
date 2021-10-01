@@ -234,3 +234,5 @@ if __name__ == "__main__":
                 },
                 str(fp),
             )
+
+# TODO: Functionalize save_model and load_model
