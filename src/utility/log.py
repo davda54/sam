@@ -13,15 +13,15 @@ class Log:
         self.epoch += 1
         if self.epoch == 0:
             self._print_header()
-        else:
-            self.flush()
+        # else:
+        #     self.flush()
 
         self.is_train = True
         self.last_steps_state = {"loss": 0.0, "accuracy": 0.0, "steps": 0}
         self._reset(len_dataset)
 
     def eval(self, len_dataset: int) -> None:
-        self.flush()
+        # self.flush()
         self.is_train = False
         self._reset(len_dataset)
 
@@ -39,14 +39,17 @@ class Log:
             print(
                 f"\r|{self.epoch:12d}  |{loss:12.4f}  |{100*accuracy:10.2f} %  |{self.learning_rate:12.3e}  |{self._time():>12}  |",
                 end="",
-                flush=True,
+                # flush=True,
             )
 
         else:
             loss = self.epoch_state["loss"] / self.epoch_state["steps"]
             accuracy = self.epoch_state["accuracy"] / self.epoch_state["steps"]
 
-            print(f"{loss:12.4f}  |{100*accuracy:10.2f} %  |", flush=True)
+            print(
+                f"{loss:12.4f}  |{100*accuracy:10.2f} %  |",
+                # flush=True
+            )
 
             if accuracy > self.best_accuracy:
                 self.best_accuracy = accuracy
@@ -73,7 +76,7 @@ class Log:
             print(
                 f"\r|{self.epoch:12d}  |{loss:12.4f}  |{100*accuracy:10.2f} %  |{learning_rate:12.3e}  |{self._time():>12}  {self.loading_bar(progress)}",
                 end="",
-                flush=True,
+                # flush=True,
             )
 
     def _eval_step(self, loss, accuracy) -> None:
