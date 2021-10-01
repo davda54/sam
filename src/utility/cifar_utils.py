@@ -134,7 +134,7 @@ coarse_classes = (  # Strict order DO NOT CHANGE
     "vehicles_2",
 )
 
-coarse_idx_to_class = { # Strict order DO NOT CHANGE
+coarse_idx_to_class = {  # Strict order DO NOT CHANGE
     0: "aquatic_mammals",
     1: "fish",
     2: "flowers",
@@ -157,7 +157,7 @@ coarse_idx_to_class = { # Strict order DO NOT CHANGE
     19: "vehicles_2",
 }
 
-coarse_class_to_idx = { # Strict order DO NOT CHANGE
+coarse_class_to_idx = {  # Strict order DO NOT CHANGE
     "aquatic_mammals": 0,
     "fish": 1,
     "flowers": 2,
@@ -182,7 +182,7 @@ coarse_class_to_idx = { # Strict order DO NOT CHANGE
 
 coarse_idxs = dict([L[::-1] for L in enumerate(coarse_classes)])
 
-fine_idx_to_coarse = np.array( # Strict order DO NOT CHANGE
+fine_idx_to_coarse = np.array(  # Strict order DO NOT CHANGE
     [
         4,
         1,
@@ -287,7 +287,7 @@ fine_idx_to_coarse = np.array( # Strict order DO NOT CHANGE
     ]
 )
 
-fine_to_coarse_idxs = dict(enumerate(fine_idx_to_coarse)) # Strict order DO NOT CHANGE
+fine_to_coarse_idxs = dict(enumerate(fine_idx_to_coarse))  # Strict order DO NOT CHANGE
 
 
 def load_dataset(split: str, _args):

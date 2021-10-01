@@ -21,7 +21,11 @@ from utility.misc_utils import get_project_root
 
 
 def make_cifar100(_arg):
-    use_fine_classes, crop_size, superclass = _arg.use_fine_classes, _arg.crop_size, _arg.superclass
+    use_fine_classes, crop_size, superclass = (
+        _arg.use_fine_classes,
+        _arg.crop_size,
+        _arg.superclass,
+    )
     cifar100 = get_project_root() / "datasets"
     cifar100.mkdir(parents=True, exist_ok=True)
 
@@ -54,13 +58,21 @@ def make_cifar100(_arg):
         root=str(cifar100), train=False, download=False, transform=test_transform,
     )
 
-    if use_fine_classes: # TODO: Make a function that selects the desired superclass
-        coarse_idx = coarse_class_to_idx[superclass] # Get the idx for the superclass we want to subset
+    if use_fine_classes:  # TODO: Make a function that selects the desired superclass
+        coarse_idx = coarse_class_to_idx[
+            superclass
+        ]  # Get the idx for the superclass we want to subset
         for _set in [_train_set, _test_set]:
-            _coarse_targets = list(map(fine_to_coarse_idxs.get, _set.targets)) # map targets from fine to coarse
-            _idx_mask = [t == coarse_idx for t in _coarse_targets] # get the indices for targets matching our superclass arg
-            _set.targets = list(compress(_set.targets, _idx_mask)) # subset targets using mask
-            _set.data = list(compress(_set.data, _idx_mask)) # subset data using mask
+            _coarse_targets = list(
+                map(fine_to_coarse_idxs.get, _set.targets)
+            )  # map targets from fine to coarse
+            _idx_mask = [
+                t == coarse_idx for t in _coarse_targets
+            ]  # get the indices for targets matching our superclass arg
+            _set.targets = list(
+                compress(_set.targets, _idx_mask)
+            )  # subset targets using mask
+            _set.data = list(compress(_set.data, _idx_mask))  # subset data using mask
     else:
         _train_set.classes, _test_set.classes = coarse_classes, coarse_classes
         _train_set.class_to_idx, _test_set.class_to_idx = coarse_idxs, coarse_idxs

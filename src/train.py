@@ -229,7 +229,7 @@ if __name__ == "__main__":
                     "loss": epoch_loss,
                     "correct": epoch_correct,
                     "size": epoch_count,
-                    "accuracy": epoch_correct/epoch_count
+                    "accuracy": epoch_correct / epoch_count
                     # TODO: ROC AUC metrics
                 },
                 str(fp),
