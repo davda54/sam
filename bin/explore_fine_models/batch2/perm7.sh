@@ -1,15 +1,15 @@
 #!/bin/sh
 
-gpu=7
-cr=32
-kr=8
-dp=28
-wd=6
-super_classes=("food_containers" "large_man-made_outdoor_things" "non-insect_invertebrates")
+cr=16
+kr=4
+dp=16
+wd=10
+super_classes=("people" "vehicles_1" "flowers")
+
 
 for sc in "${super_classes[@]}"; do
   mkdir -p logs/model/fine/${sc}/crop${cr}/kernel${kr}/depth${dp}/width${wd}/
-  python -u src/train.py --gpu $gpu \
+  python -u src/train.py  \
   --fine_classes --superclass $sc \
   --crop_size $cr --kernel_size $kr \
   --depth $dp --width_factor $wd  \
