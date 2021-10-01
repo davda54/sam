@@ -128,10 +128,11 @@ if __name__ == "__main__":
         get_project_root()
         / "models"
         / args.granularity
+        / args.superclass
         / f"crop{str(args.crop_size)}"
+        / f"kernel{str(args.kernel_size)}"
         / f"width{str(args.width_factor)}"
         / f"depth{str(args.depth)}"
-        / args.superclass
         / f"model_{args.granularity}_{args.superclass}_crop{args.crop_size}_kernel{args.kernel_size}_width{args.width_factor}_depth{args.depth}.pt"
     )
     fp.parent.mkdir(parents=True, exist_ok=True)
