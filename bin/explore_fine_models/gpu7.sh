@@ -1,10 +1,10 @@
 #!/bin/sh
 
-gpu=1
-cr=16
-kr=4
-dp=22
-wd=8
+gpu=7
+cr=32
+kr=8
+dp=28
+wd=6
 super_classes=("food_containers" "large_man-made_outdoor_things" "non-insect_invertebrates")
 
 for sc in "${super_classes[@]}"; do
