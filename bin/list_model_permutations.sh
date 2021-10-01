@@ -16,7 +16,7 @@ for cr in "${crop_options[@]}"; do
 done
 
 crop_options=(16 32)
-depth_options=(12 16 20 24)
+depth_options=(12 16 20 24 28)
 width_options=(6 8 10 12)
 kernel_options=(4 8)
 super_classes=("aquatic_mammals" "fish" "flowers" "food_containers" "fruit_and_vegetables"
