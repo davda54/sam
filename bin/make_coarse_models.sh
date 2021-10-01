@@ -1,12 +1,12 @@
 #!/bin/sh
 
-crop_options=(4 8 16)
-depth_options=(4 8 12 16 20 24)
-width_options=(2 4 6 8)
-kernel_options=(2 3 4)
+crop_options=(8 16)
+kernel_options=(2 4)
+depth_options=(16 22 28)
+width_options=(2 6 10)
 
-for kr in "${kernel_options[@]}"; do
-  for cr in "${crop_options[@]}"; do
+for i in "${!crop_options[@]}"; do
+    cr="${crop_options[i]}"; kr="${kernel_options[i]}"
     for dp in "${depth_options[@]}"; do
       for wd in "${width_options[@]}"; do
         python -u src/train.py \
@@ -17,7 +17,6 @@ for kr in "${kernel_options[@]}"; do
         --depth $dp \
         --width_factor $wd  \
         | tee logs/model_coarse_all_crop${cr}_kernel${kr}_depth${dp}_width${wd}.log
-      done
     done
   done
 done
