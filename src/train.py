@@ -128,11 +128,11 @@ if __name__ == "__main__":
         get_project_root()
         / "models"
         / args.granularity
-        / str(args.crop_size)
-        / str(args.width_factor)
-        / str(args.depth)
+        / f"crop{str(args.crop_size)}"
+        / f"width{str(args.width_factor)}"
+        / f"depth{str(args.depth)}"
         / args.superclass
-        / f"model_{args.granularity}_{args.superclass}_crop{args.crop_size}_kernel{args.kernel_size}_width{args.width_factor}_depth{args.depth}"
+        / f"model_{args.granularity}_{args.superclass}_crop{args.crop_size}_kernel{args.kernel_size}_width{args.width_factor}_depth{args.depth}.pt"
     )
     fp.parent.mkdir(parents=True, exist_ok=True)
 
@@ -197,15 +197,19 @@ if __name__ == "__main__":
         model.eval()
         log.eval(len_dataset=len(test_set))
         epoch_loss = 0.0
+        epoch_correct = 0.0
+        epoch_count = 0.0
         with torch.no_grad():
             for batch in test_set:
                 inputs, targets = (b.to(device) for b in batch)
                 predictions = model(inputs)
                 loss = smooth_crossentropy(predictions, targets)
-                # print("shape: ", loss.shape)
-                # print("sum: ", loss.sum().item())
                 batch_loss = loss.sum().item()
                 epoch_loss += batch_loss
+                # TODO Export the accuracy
+                batch_correct = correct.sum().item()
+                epoch_correct += batch_correct
+                epoch_count += len(targets)
                 correct = torch.argmax(predictions, 1) == targets
                 log(model, loss.cpu(), correct.cpu())
 
@@ -222,6 +226,10 @@ if __name__ == "__main__":
                     "model_state_dict": model.state_dict(),
                     "optimizer_state_dict": optimizer.state_dict(),
                     "loss": epoch_loss,
+                    "correct": epoch_correct,
+                    "size": epoch_count,
+                    "accuracy": epoch_correct/epoch_count
+                    # TODO: ROC AUC metrics
                 },
                 str(fp),
             )
