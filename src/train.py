@@ -1,5 +1,6 @@
 import argparse
 import torch
+import os
 import numpy as np
 from model.wide_res_net import WideResNet
 from model.smooth_cross_entropy import smooth_crossentropy
@@ -9,7 +10,7 @@ from utility.initialize import initialize
 from utility.step_lr import StepLR
 from utility.bypass_bn import enable_running_stats, disable_running_stats
 from sam import SAM
-
+import GPUtil
 from pathlib import Path
 
 
@@ -17,16 +18,15 @@ def get_project_root() -> Path:
     return Path(__file__).parent.parent
 
 
-# TODO: Make sure commenting this out does not break anything
+# TODO: Check if sys.path.append is nessecary
 import sys
-
 sys.path.append(get_project_root)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--gpu", default=7, type=int, help="Index value for the GPU to use",
+        "--gpu", default=-1, type=int, help="Index value for the GPU to use",
     )
     parser.add_argument("--fine_classes", dest="use_fine_classes", action="store_true")
     parser.add_argument(
@@ -106,7 +106,23 @@ if __name__ == "__main__":
             superclass = "all"
 
     initialize(args, seed=42)
-    device = torch.device(f"cuda:{args.gpu}" if torch.cuda.is_available() else "cpu")
+
+    if args.gpu == -1:
+        # Set CUDA_DEVICE_ORDER so the IDs assigned by CUDA match those from nvidia-smi
+        os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+        # Get the first available GPU
+        DEVICE_ID_LIST = GPUtil.getFirstAvailable()
+        DEVICE_ID = DEVICE_ID_LIST[0]  # grab first element from list
+        device = torch.device(f"cuda:{DEVICE_ID}" if torch.cuda.is_available() else "cpu")
+        # # Set CUDA_VISIBLE_DEVICES to mask out all other GPUs than the first available device id
+        # os.environ["CUDA_VISIBLE_DEVICES"] = str(DEVICE_ID)
+        # # Since all other GPUs are masked out, the first available GPU will now be identified as GPU:0
+        # print('Device ID (unmasked): ' + str(DEVICE_ID))
+        # print('Device ID (masked): ' + str(0))
+        # device = torch.device(f"cuda:0" if torch.cuda.is_available() else "cpu")
+    else:
+        device = torch.device(f"cuda:{args.gpu}" if torch.cuda.is_available() else "cpu")
+
 
     dataset_train = load_dataset("train", args)
     dataset_test = load_dataset("train", args)
