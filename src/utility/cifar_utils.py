@@ -2,11 +2,9 @@ import numpy as np
 import torch
 import torchvision
 from pathlib import Path
-from misc_utils import get_project_root
 
-# TODO: Confirm that importing get_project_root() does not break cifar_utils.py
-# def get_project_root() -> Path:
-#     return Path(__file__).parent.parent.parent
+def get_project_root() -> Path:
+    return Path(__file__).parent.parent.parent
 
 
 fine_classes = (  # Strict order DO NOT CHANGE
