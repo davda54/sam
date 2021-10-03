@@ -1,6 +1,6 @@
 #!/bin/sh
 
-gpu=5
+gpu=3
 crop_options=(24)
 kernel_options=(6)
 depth_options=(22)
