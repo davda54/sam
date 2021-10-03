@@ -16,7 +16,7 @@ for i in "${!crop_options[@]}"; do
         --kernel_size $kr \
         --depth $dp \
         --width_factor $wd  \
-        | tee logs/model_coarse_all_crop${cr}_kernel${kr}_depth${dp}_width${wd}.log
+        | tee "logs/model/coarse/all/crop${cr}/kernel${kr}/depth${dp}/width${wd}/model_coarse_all_crop${cr}_kernel${kr}_depth${dp}_width${wd}.log"
     done
   done
 done

@@ -23,7 +23,7 @@ for i in "${!crop_options[@]}"; do
           --kernel_size $kr \
           --depth $dp \
           --width_factor $wd  \
-          | tee logs/model_fine_${sc}_crop${cr}_kernel${kr}_depth${dp}_width${wd}.log
+          | tee "logs/model_fine_${sc}_crop${cr}_kernel${kr}_depth${dp}_width${wd}.log"
         done
       done
     done

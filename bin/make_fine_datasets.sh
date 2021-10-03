@@ -9,7 +9,7 @@ for cl in "fine"; do
   for sc in "${super_classes[@]}"; do
     for cs in "${crop_options[@]}"; do
       python -u src/cifar100.py --${cl}_classes --crop_size $cs --superclass $sc \
-      | tee logs/dataset_${cl}_${sc}_crop${cs}.log
+      | tee "logs/dataset_${cl}_${sc}_crop${cs}.log"
       done
   done
 done
