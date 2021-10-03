@@ -20,6 +20,7 @@ def get_project_root() -> Path:
 
 # TODO: Check if sys.path.append is nessecary
 import sys
+
 sys.path.append(get_project_root)
 
 
@@ -113,7 +114,9 @@ if __name__ == "__main__":
         # Get the first available GPU
         DEVICE_ID_LIST = GPUtil.getFirstAvailable()
         DEVICE_ID = DEVICE_ID_LIST[0]  # grab first element from list
-        device = torch.device(f"cuda:{DEVICE_ID}" if torch.cuda.is_available() else "cpu")
+        device = torch.device(
+            f"cuda:{DEVICE_ID}" if torch.cuda.is_available() else "cpu"
+        )
         # # Set CUDA_VISIBLE_DEVICES to mask out all other GPUs than the first available device id
         # os.environ["CUDA_VISIBLE_DEVICES"] = str(DEVICE_ID)
         # # Since all other GPUs are masked out, the first available GPU will now be identified as GPU:0
@@ -121,8 +124,9 @@ if __name__ == "__main__":
         # print('Device ID (masked): ' + str(0))
         # device = torch.device(f"cuda:0" if torch.cuda.is_available() else "cpu")
     else:
-        device = torch.device(f"cuda:{args.gpu}" if torch.cuda.is_available() else "cpu")
-
+        device = torch.device(
+            f"cuda:{args.gpu}" if torch.cuda.is_available() else "cpu"
+        )
 
     dataset_train = load_dataset("train", args)
     dataset_test = load_dataset("train", args)

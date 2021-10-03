@@ -3,6 +3,7 @@ import torch
 import torchvision
 from pathlib import Path
 
+
 def get_project_root() -> Path:
     return Path(__file__).parent.parent.parent
 
@@ -120,11 +121,11 @@ coarse_classes = (  # Strict order DO NOT CHANGE
     "household_furniture",
     "insects",
     "large_carnivores",
-    "large_man - made_outdoor_things",
+    "large_man-made_outdoor_things",
     "large_natural_outdoor_scenes",
     "large_omnivores_and_herbivores",
     "medium_mammals",
-    "non - insect_invertebrates",
+    "non-insect_invertebrates",
     "people",
     "reptiles",
     "small_mammals",
