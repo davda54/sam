@@ -228,10 +228,10 @@ if __name__ == "__main__":
                 batch_loss = loss.sum().item()
                 epoch_loss += batch_loss
                 # TODO Export the accuracy
+                correct = torch.argmax(predictions, 1) == targets
                 batch_correct = correct.sum().item()
                 epoch_correct += batch_correct
                 epoch_count += len(targets)
-                correct = torch.argmax(predictions, 1) == targets
                 log(model, loss.cpu(), correct.cpu())
 
         log.flush()
