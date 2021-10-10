@@ -1,8 +1,6 @@
 import argparse
 import csv
 import os
-
-# import pickle
 from pathlib import Path
 
 import pandas as pd
@@ -289,11 +287,6 @@ def main(_args):
             path_or_buf=str(evaluations_path / f"test_eval__{model_filename}.csv"),
             index=False,
         )
-        # model_results[model_filename] = {}
-        # model_results[model_filename]["validation"] = validation_results
-        # model_results[model_filename]["test"] = test_results
-
-    # return model_results
 
 
 if __name__ == "__main__":
@@ -307,7 +300,3 @@ if __name__ == "__main__":
     args = parser.parse_args()
     print("Getting model results")
     main(args)
-    # model_results = main(args)
-    # pickle_path = str(project_path / "model_results.pkl")
-    # print(f"Pickling results to file: {pickle_path}")
-    # pickle.dump(model_results, open(pickle_path, "wb"))
