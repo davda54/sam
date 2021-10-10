@@ -151,7 +151,7 @@ def main(_args):
         ]
         model.load_state_dict(model_state_dict)
         model.eval()
-        test_results = evaluate(model, test_dataloader, device)
+        test_results = evaluate(test_dataloader, model, device)
         # validation_results = evaluate(validation_dataloader, model, device)
         model_results[model_filename] = {}
         model_results[model_filename]["test"] = test_results
