@@ -1,9 +1,10 @@
+from pathlib import Path
+
 import numpy as np
 import torch
 import torchvision
-from torch.utils.data import Dataset, DataLoader
-from pathlib import Path
 import torchvision.transforms as transforms
+from torch.utils.data import DataLoader, Dataset
 
 
 def get_project_path() -> Path:
@@ -51,21 +52,6 @@ def save_dataset(data: torchvision.datasets, split: str, _args):
     output_path.parent.mkdir(parents=True, exist_ok=True)
     print(f"Saving: {output_path}")
     torch.save(data, output_path)
-
-
-class CIFAR100Indexed(Dataset):
-    def __init__(self, root, download, train, transform):
-        self.cifar100 = torchvision.datasets.CIFAR100(
-            root=root, download=download, train=train, transform=transform
-        )
-
-    def __getitem__(self, index):
-        data, target = self.cifar100[index]
-        return data, target, index
-
-    def __len__(self):
-        return len(self.cifar100)
-
 
 fine_classes = (  # Strict order DO NOT CHANGE
     "apple",
