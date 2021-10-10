@@ -20,6 +20,19 @@ from itertools import compress
 from utility.cifar_utils import coarse_class_to_idx
 
 Result = namedtuple("Result", ["idx", "output", "prediction", "target", "correct"])
+Profile = namedtuple(
+    "Profile",
+    [
+        "granularity",
+        "superclass",
+        "crop_size",
+        "kernel_size",
+        "width_factor",
+        "depth",
+        "accuracy",
+        "flops",
+    ],
+)
 
 
 def get_project_path() -> Path:
@@ -41,7 +54,7 @@ def get_superclass(name: str) -> int:
 
 def get_parameter(name: str, param: str) -> int:
     extension = "." + name.split(".")[-1]
-    if param not in ["crop", "kernel", "width", "depth"]:
+    if param not in ["class", "crop", "kernel", "width", "depth"]:
         raise ValueError("invalid parameter input")
     for element in name.split("_"):
         if param in element:
@@ -49,15 +62,16 @@ def get_parameter(name: str, param: str) -> int:
 
 
 def get_parameters(model_filename):
+    granularity = get_granularity(model_filename)
+    class_id = int(get_parameter(model_filename, "class"))
     crop_size = int(get_parameter(model_filename, "crop"))
     kernel_size = int(get_parameter(model_filename, "kernel"))
     width_factor = int(get_parameter(model_filename, "width"))
     depth = int(get_parameter(model_filename, "depth"))
-    granularity = get_granularity(model_filename)
-    return crop_size, kernel_size, width_factor, depth, granularity
+    return granularity, class_id, crop_size, kernel_size, width_factor, depth
 
 
-def model_name_from_path(model_path):
+def parse_model_path(model_path):
     model_name = str(model_path.split("/")[-1])
     model_name = model_name.replace(".pt", "").replace("model_", "")
     model_name = superclass_to_idx(model_name)
@@ -65,10 +79,17 @@ def model_name_from_path(model_path):
 
 
 def superclass_to_idx(filename: str):
+    """
+    input a model filename
+    output is model filename with the superclass label name replaced with index
+    coarse granularity models have their generic term removed
+    """
+    if "all_" in filename:  # if coarse just removes the superclass placeholder
+        return filename.replace("all_", ""), None
     keys = coarse_class_to_idx.keys()
     superclass = next(compress(keys, [k in filename for k in keys]))
     superclass_idx = coarse_class_to_idx[superclass]
-    return filename.replace(superclass, superclass_idx)
+    return filename.replace(superclass, "class" + str(superclass_idx))
 
 
 class CIFAR100Indexed(Dataset):
@@ -175,15 +196,20 @@ def main(_args):
     # TODO: can I speed this up using gpus/multiprocessing
     for model_path in tqdm(model_paths, desc="Model evaluations"):
 
-        model_filename = model_name_from_path(model_path)
-
-        crop_size, kernel_size, width_factor, depth, granularity = get_parameters(
-            model_filename
-        )
-
+        model_filename = parse_model_path(model_path)
         print(model_filename)
-        print(crop_size, kernel_size, width_factor, depth, granularity)
 
+        (
+            granularity,
+            class_id,
+            crop_size,
+            kernel_size,
+            width_factor,
+            depth,
+        ) = get_parameters(model_filename)
+
+        params = [granularity, class_id, crop_size, kernel_size, width_factor, depth]
+        print(params)
         if granularity == "coarse":
             n_labels = 20
         elif granularity == "fine":
@@ -207,26 +233,34 @@ def main(_args):
         model.eval()
 
         # TODO: generate a model profile by calculating the FLOPS
-        # ModelName == [granularity, superclass, crop_size, width, depth]
-        # ModelProfile == ModelName + [accuracy, flops]
+        flops = 999999
 
         validation_results, validation_accuracy = evaluate(
             validation_dataloader, model, device
         )
         validation_df = pd.DataFrame(validation_results)
         validation_df.to_csv(
-            path_or_buf=str(evaluations_path / model_filename), index_label="index"
+            path_or_buf=str(evaluations_path / model_filename / "validation_eval.csv"),
+            index_label="index",
         )
-        test_results, test_accuracy = evaluate(test_dataloader, model, device)
-        validation_df = pd.DataFrame(validation_results)
-        validation_df.to_csv(
-            path_or_buf=str(evaluations_path / model_filename), index_label="index"
-        )
-        model_results[model_filename] = {}
-        model_results[model_filename]["validation"] = validation_results
-        model_results[model_filename]["test"] = test_results
 
-    return model_results
+        profile_ = Profile(*(params + [validation_accuracy, flops]))
+        profile_df = pd.DataFrame(profile_)
+        profile_df.to_csv(
+            str(evaluations_path / "model_profiles.csv"), mode="a", header=False
+        )
+
+        test_results, _ = evaluate(test_dataloader, model, device)
+        test_df = pd.DataFrame(test_results)
+        test_df.to_csv(
+            path_or_buf=str(evaluations_path / model_filename / "test_eval.csv"),
+            index_label="index",
+        )
+        # model_results[model_filename] = {}
+        # model_results[model_filename]["validation"] = validation_results
+        # model_results[model_filename]["test"] = test_results
+
+    # return model_results
 
 
 if __name__ == "__main__":
@@ -239,7 +273,8 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
     print("Getting model results")
-    model_results = main(args)
-    pickle_path = str(project_path / "model_results.pkl")
-    print(f"Pickling results to file: {pickle_path}")
-    pickle.dump(model_results, open(pickle_path, "wb"))
+    main(args)
+    # model_results = main(args)
+    # pickle_path = str(project_path / "model_results.pkl")
+    # print(f"Pickling results to file: {pickle_path}")
+    # pickle.dump(model_results, open(pickle_path, "wb"))
