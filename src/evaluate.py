@@ -2,20 +2,30 @@ import argparse
 import os
 import pickle
 from pathlib import Path
-from tqdm.auto import tqdm
+
 import pandas as pd
 import torch
 import torchvision
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader, Dataset
+from tqdm.auto import tqdm
 
 from model.wide_res_net import WideResNet
 from utility.cifar_utils import cifar100_stats
-
+from utility.parse_logs import get_granularity, get_superclass
 
 def get_project_path() -> Path:
     return Path(__file__).parent.parent
 
+
+def get_parameter(name: str, param: str) -> int:
+    extension = '.' + name.split('.')[-1]
+    if param not in ["crop", "kernel", "width", "depth"]:
+        raise ValueError("invalid parameter input")
+    for element in name.split("_"):
+        if param in element:
+
+            return int(element.replace(param, "").replace(extension, ""))
 
 class CIFAR100Indexed(Dataset):
     def __init__(self, root, download, train, transform):
@@ -48,7 +58,9 @@ def find_model_files(model_path=(project_path / "models")):
 def evaluate(dataloader, model, device):
     results = {}
     with torch.no_grad():
-        for batch_idx, batch in tqdm(enumerate(dataloader), desc="Batch evaluations", leave=True):
+        for batch_idx, batch in tqdm(
+            enumerate(dataloader), desc="Batch evaluations", leave=True
+        ):
             inputs, targets, idx = (b.to(device) for b in batch)
             outputs = model(inputs)
             predictions = torch.argmax(outputs, 1)
@@ -108,10 +120,10 @@ def main(_args):
         # TODO: Parse out the crop/kernel/width/depth from the model's filepath
         # TODO: Init the model object using the parsed values
         # TODO: Parse out crop or fine from model fp and assign n_labels
-        # for element in model_fp.split("_"):
-        #     if 'crop' in element:
-        #         crop_size = int(element.replace('crop', ''))
-        # ts, vs = copy(test_set), copy(validation_set)
+        int(get_parameter(model_filename, "crop"))
+        int(get_parameter(model_filename, "kernel"))
+        int(get_parameter(model_filename, "width"))
+        int(get_parameter(model_filename, "depth"))
 
         if "coarse" in model_filename:
             n_labels = 20

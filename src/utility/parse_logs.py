@@ -42,11 +42,13 @@ def get_superclass(name: str) -> str:
 
 
 def get_parameter(name: str, param: str) -> int:
+    extension = '.' + name.split('.')[-1]
     if param not in ["crop", "kernel", "width", "depth"]:
         raise ValueError("invalid parameter input")
     for element in name.split("_"):
         if param in element:
-            return int(element.replace(param, ""))
+
+            return int(element.replace(param, "").replace(extension, ""))
 
 
 def find_log_files(path=(get_project_root() / "logs" / "model")) -> List[str]:
