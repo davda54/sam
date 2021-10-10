@@ -1,10 +1,11 @@
-import random
 import argparse
-import torch
+import random
 from itertools import compress
-from misc_utils import get_project_root
+
+import torch
 import torchvision.transforms as transforms
 from cifar_utils import cifar100_stats
+from misc_utils import get_project_root
 from torch.utils.data import Dataset
 from torchvision.datasets import CIFAR100
 

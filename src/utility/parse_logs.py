@@ -1,8 +1,9 @@
-from pathlib import Path
 import os
+from pathlib import Path
+from typing import List
+
 import pandas as pd
 from cifar_utils import coarse_classes
-from typing import List
 
 
 def get_project_root() -> Path:

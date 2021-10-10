@@ -1,5 +1,6 @@
-from utility.loading_bar import LoadingBar
 import time
+
+from utility.loading_bar import LoadingBar
 
 
 class Log:

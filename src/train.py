@@ -1,17 +1,19 @@
 import argparse
-import torch
 import os
-import numpy as np
-from model.wide_res_net import WideResNet
-from model.smooth_cross_entropy import smooth_crossentropy
-from utility.cifar_utils import load_dataset
-from utility.log import Log
-from utility.initialize import initialize
-from utility.step_lr import StepLR
-from utility.bypass_bn import enable_running_stats, disable_running_stats
-from sam import SAM
-import GPUtil
 from pathlib import Path
+
+import GPUtil
+import numpy as np
+import torch
+
+from model.smooth_cross_entropy import smooth_crossentropy
+from model.wide_res_net import WideResNet
+from sam import SAM
+from utility.bypass_bn import disable_running_stats, enable_running_stats
+from utility.cifar_utils import load_dataset
+from utility.initialize import initialize
+from utility.log import Log
+from utility.step_lr import StepLR
 
 
 def get_project_root() -> Path:

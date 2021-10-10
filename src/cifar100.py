@@ -1,22 +1,21 @@
-import random
 import argparse
+import random
+from itertools import compress
 
 import torch
 import torchvision
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
-from itertools import compress
 
-from utility.cutout import Cutout
 from utility.cifar_utils import (
+    coarse_class_to_idx,
     coarse_classes,
     coarse_idxs,
     fine_to_coarse_idxs,
-    coarse_class_to_idx,
     load_dataset,
     save_dataset,
 )
-
+from utility.cutout import Cutout
 from utility.misc_utils import get_project_root
 
 
