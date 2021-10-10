@@ -204,8 +204,8 @@ def main(_args):
 
     test_fine_dataloader = get_test_dataloader(coarse=False)
     test_coarse_dataloader = get_test_dataloader(coarse=True)
-    validation_coarse_dataloader = get_validation_dataloader(coarse=False)
     validation_fine_dataloader = get_validation_dataloader(coarse=False)
+    validation_coarse_dataloader = get_validation_dataloader(coarse=True)
 
     model_paths = find_model_files()
 
