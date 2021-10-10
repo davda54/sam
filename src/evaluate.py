@@ -79,12 +79,9 @@ def evaluate(dataloader, model, device):
             outputs = model(inputs)
             predictions = torch.argmax(outputs, 1)
             correct = torch.argmax(outputs, 1) == targets
-            zipped = zip(
-                idxs.cpu(),
-                zip(*(outputs.cpu(), predictions.cpu(), targets.cpu(), correct.cpu())),
-            )
+            zipped = zip(idxs, zip(*(outputs, predictions, targets, correct)),)
             for idx, data in zipped:
-                results[idx] = data
+                results[idx.tolist()] = [element.tolist() for element in data]
     return results
 
 
