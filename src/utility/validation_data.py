@@ -4,10 +4,26 @@ import torch
 from itertools import compress
 from misc_utils import get_project_root
 import torchvision.transforms as transforms
-from cifar_utils import CIFAR100Indexed, cifar100_stats
+from cifar_utils import cifar100_stats
+from torch.utils.data import Dataset
+from torchvision.datasets import CIFAR100
 
 dataset_path = get_project_root() / "datasets"
 dataset_path.mkdir(parents=True, exist_ok=True)
+
+
+class CIFAR100Indexed(Dataset):
+    def __init__(self, root, download, train, transform):
+        self.cifar100 = CIFAR100(
+            root=root, download=download, train=train, transform=transform
+        )
+
+    def __getitem__(self, index):
+        data, target = self.cifar100[index]
+        return data, target, index
+
+    def __len__(self):
+        return len(self.cifar100)
 
 
 def make_validation_dataset():
