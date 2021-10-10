@@ -69,8 +69,9 @@ def find_model_files(model_path=(project_path / "models")):
 def evaluate(dataloader, model, device):
     dataset_type = dataloader.dataset.cifar100.meta["type"]
     results = {}
+    # currently assumes batch size is 1
     with torch.no_grad():
-        for inputs, targets, idx in tqdm(
+        for inputs, targets, idxs in tqdm(
             dataloader, desc=f"Evaluating {dataset_type} data"
         ):
             # inputs, targets, idxs = (b.to(device) for b in batch)
@@ -78,7 +79,7 @@ def evaluate(dataloader, model, device):
             outputs = model(inputs)
             predictions = torch.argmax(outputs, 1)
             correct = torch.argmax(outputs, 1) == targets
-            results[idx] = [
+            results[idxs] = [
                 outputs,
                 predictions,
                 targets,
@@ -128,11 +129,13 @@ def main(_args):
 
     model_paths = find_model_files()
 
-    # CROPPING DOWN PATHS DURING DEVELOPMENT
-    model_paths = model_paths[:5]
+    # TODO: Remove later CROPPING DOWN PATHS DURING DEVELOPMENT
+    model_paths = model_paths[:2]
     model_results = {}
 
-    for model_path in tqdm(model_paths, desc="Model evaluations", leave=True):
+    # TODO: dump results to file after each iteration in this loop
+    # TODO: speed this by increasing batch size or use gpus/multiprocessing
+    for model_path in tqdm(model_paths, desc="Model evaluations"):
         model_filename = str(model_path.split("/")[-1])
 
         crop_size = int(get_parameter(model_filename, "crop"))
