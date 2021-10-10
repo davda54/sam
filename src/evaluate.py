@@ -67,15 +67,18 @@ def find_model_files(model_path=(project_path / "models")):
 def evaluate(dataloader, model, device):
     results = {}
     with torch.no_grad():
-        for batch_idx, (inputs, targets, idxs) in tqdm(enumerate(dataloader)):
+        for inputs, targets, idx in tqdm(dataloader):
             # inputs, targets, idxs = (b.to(device) for b in batch)
-            print(f"Batch idx {batch_idx}, dataset index {idxs}")
+            # print(f"Batch idx {batch_idx}, dataset index {idxs}")
             outputs = model(inputs)
             predictions = torch.argmax(outputs, 1)
             correct = torch.argmax(outputs, 1) == targets
-            results[batch_idx] = list(
-                zip(idxs, targets, outputs, predictions, correct)
-            )  # TODO: NamedTuple? Dict? Whatever gets this into pandas DF!
+            results[idx] = [
+                outputs,
+                predictions,
+                targets,
+                correct,
+            ]  # TODO: NamedTuple? Dict? Whatever gets this into pandas DF!
     return results
 
 
