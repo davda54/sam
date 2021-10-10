@@ -1,7 +1,9 @@
 import argparse
 import os
+import pickle
 from pathlib import Path
 
+import pandas as pd
 import torch
 import torchvision
 import torchvision.transforms as transforms
@@ -138,6 +140,8 @@ def main(_args):
         model_results[model_filename]["test"] = test_results
         # model_results[model_filename]['validation'] = validation_results
 
+    return model_results
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -145,4 +149,6 @@ if __name__ == "__main__":
         "--gpu", default=6, type=int, help="Index of GPU to use",
     )
     args = parser.parse_args()
-    main(args)
+    model_results = main(args)
+    pickle.dump(model_results, open(str(project_path / "model_results.pkl"), "wb"))
+    # save to CSV using pandas
