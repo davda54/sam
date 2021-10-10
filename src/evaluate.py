@@ -2,7 +2,7 @@ import argparse
 import os
 import pickle
 from pathlib import Path
-
+from tqdm.auto import tqdm
 import pandas as pd
 import torch
 import torchvision
@@ -48,7 +48,7 @@ def find_model_files(model_path=(project_path / "models")):
 def evaluate(dataloader, model, device):
     results = {}
     with torch.no_grad():
-        for batch_idx, batch in enumerate(dataloader):
+        for batch_idx, batch in tqdm(enumerate(dataloader), desc="Batch evaluations", leave=True):
             inputs, targets, idx = (b.to(device) for b in batch)
             outputs = model(inputs)
             predictions = torch.argmax(outputs, 1)
@@ -102,7 +102,7 @@ def main(_args):
 
     model_results = {}
 
-    for model_path in model_paths:
+    for model_path in tqdm(model_paths, desc="Model evaluations", leave=True):
         model_filename = str(model_path.split("/")[-1])
 
         # TODO: Parse out the crop/kernel/width/depth from the model's filepath
@@ -149,6 +149,8 @@ if __name__ == "__main__":
         "--gpu", default=6, type=int, help="Index of GPU to use",
     )
     args = parser.parse_args()
+    print("Getting model results")
     model_results = main(args)
+    print("Pickling results to file")
     pickle.dump(model_results, open(str(project_path / "model_results.pkl"), "wb"))
     # save to CSV using pandas
