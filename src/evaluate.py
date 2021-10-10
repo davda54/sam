@@ -21,6 +21,12 @@ from itertools import compress
 
 from utility.cifar_utils import coarse_class_to_idx
 
+project_path = Path(__file__).parent.parent
+dataset_path = project_path / "datasets"
+dataset_path.mkdir(parents=True, exist_ok=True)
+evaluations_path = project_path / "evaluations"
+evaluations_path.mkdir(parents=True, exist_ok=True)
+
 Result = namedtuple("Result", ["idx", "output", "prediction", "target", "correct"])
 profile_fields = [
     "granularity",
@@ -33,10 +39,6 @@ profile_fields = [
     "flops",
 ]
 Profile = namedtuple("Profile", profile_fields,)
-
-
-def get_project_path() -> Path:
-    return Path(__file__).parent.parent
 
 
 def get_granularity(name: str) -> str:
@@ -106,13 +108,6 @@ class CIFAR100Indexed(Dataset):
         return len(self.cifar100)
 
 
-project_path = get_project_path()
-dataset_path = project_path / "datasets"
-dataset_path.mkdir(parents=True, exist_ok=True)
-evaluations_path = project_path / "evaluations"
-evaluations_path.mkdir(parents=True, exist_ok=True)
-
-
 def find_model_files(model_path=(project_path / "models")):
     model_files = []
     for root, directories, files in os.walk(model_path):
@@ -122,8 +117,7 @@ def find_model_files(model_path=(project_path / "models")):
     return model_files
 
 
-def evaluate(dataloader, model, device):
-    dataset_type = dataloader.dataset.cifar100.meta["type"]
+def evaluate(dataloader, model, dataset_type):
     results = []
     # total_loss = 0.0
     total_correct = 0.0
@@ -241,7 +235,7 @@ def main(_args):
         flops = 999999
 
         validation_results, validation_accuracy = evaluate(
-            validation_dataloader, model, device
+            validation_dataloader, model, "validation"
         )
         validation_df = pd.DataFrame(validation_results)
         validation_df.to_csv(
@@ -252,10 +246,10 @@ def main(_args):
         )
 
         profile_ = Profile(*(params + [validation_accuracy, flops]))
-        profile_df = pd.DataFrame(profile_)
+        profile_df = pd.DataFrame([profile_], columns=profile_fields)
         profile_df.to_csv(profiles_path, mode="a", header=False)
 
-        test_results, _ = evaluate(test_dataloader, model, device)
+        test_results, _ = evaluate(test_dataloader, model, "test")
         test_df = pd.DataFrame(test_results)
         test_df.to_csv(
             path_or_buf=str(evaluations_path / f"test_eval__{model_filename}.csv"),
