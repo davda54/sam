@@ -245,7 +245,9 @@ def main(_args):
         )
         validation_df = pd.DataFrame(validation_results)
         validation_df.to_csv(
-            path_or_buf=str(evaluations_path / model_filename / "validation_eval.csv"),
+            path_or_buf=str(
+                evaluations_path / f"validation_eval__{model_filename}.csv"
+            ),
             index_label="index",
         )
 
@@ -256,7 +258,7 @@ def main(_args):
         test_results, _ = evaluate(test_dataloader, model, device)
         test_df = pd.DataFrame(test_results)
         test_df.to_csv(
-            path_or_buf=str(evaluations_path / model_filename / "test_eval.csv"),
+            path_or_buf=str(evaluations_path / f"test_eval__{model_filename}.csv"),
             index_label="index",
         )
         # model_results[model_filename] = {}
