@@ -1,11 +1,70 @@
 import numpy as np
 import torch
 import torchvision
+from torch.utils.data import Dataset, DataLoader
 from pathlib import Path
+import torchvision.transforms as transforms
 
 
-def get_project_root() -> Path:
+def get_project_path() -> Path:
     return Path(__file__).parent.parent.parent
+
+
+def cifar100_stats(root=str(get_project_path() / "datasets")):
+    _data_set = torchvision.datasets.CIFAR100(
+        root=root, train=True, download=True, transform=transforms.ToTensor(),
+    )
+
+    _data_tensors = torch.cat([d[0] for d in DataLoader(_data_set)])
+    mean, std = _data_tensors.mean(dim=[0, 2, 3]), _data_tensors.std(dim=[0, 2, 3])
+    return mean, std
+
+
+def load_dataset(split: str, _args):
+    if split not in ["train", "test"]:
+        raise ValueError("split must be 'train' or 'test'")
+    fp = (
+        get_project_path()
+        / "datasets"
+        / split
+        / _args.granularity
+        / _args.superclass
+        / f"crop_size{str(_args.crop_size)}"
+        / f"dataset_{split}_{_args.granularity}_{_args.superclass}_crop{str(_args.crop_size)}.pt"
+    )
+    dataset = torch.load(fp)
+    return dataset
+
+
+def save_dataset(data: torchvision.datasets, split: str, _args):
+    if split not in ["train", "test"]:
+        raise ValueError("split must be 'train' or 'test'")
+    output_path = (
+        get_project_path()
+        / "datasets"
+        / split
+        / _args.granularity
+        / _args.superclass
+        / f"crop_size{str(_args.crop_size)}"
+        / f"dataset_{split}_{_args.granularity}_{_args.superclass}_crop{str(_args.crop_size)}.pt"
+    )
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    print(f"Saving: {output_path}")
+    torch.save(data, output_path)
+
+
+class CIFAR100Indexed(Dataset):
+    def __init__(self, root, download, train, transform):
+        self.cifar100 = torchvision.datasets.CIFAR100(
+            root=root, download=download, train=train, transform=transform
+        )
+
+    def __getitem__(self, index):
+        data, target = self.cifar100[index]
+        return data, target, index
+
+    def __len__(self):
+        return len(self.cifar100)
 
 
 fine_classes = (  # Strict order DO NOT CHANGE
@@ -288,36 +347,3 @@ fine_idx_to_coarse = np.array(  # Strict order DO NOT CHANGE
 )
 
 fine_to_coarse_idxs = dict(enumerate(fine_idx_to_coarse))  # Strict order DO NOT CHANGE
-
-
-def load_dataset(split: str, _args):
-    if split not in ["train", "test"]:
-        raise ValueError("split must be 'train' or 'test'")
-    fp = (
-        get_project_root()
-        / "datasets"
-        / split
-        / _args.granularity
-        / _args.superclass
-        / f"crop_size{str(_args.crop_size)}"
-        / f"dataset_{split}_{_args.granularity}_{_args.superclass}_crop{str(_args.crop_size)}.pt"
-    )
-    dataset = torch.load(fp)
-    return dataset
-
-
-def save_dataset(data: torchvision.datasets, split: str, _args):
-    if split not in ["train", "test"]:
-        raise ValueError("split must be 'train' or 'test'")
-    fp = (
-        get_project_root()
-        / "datasets"
-        / split
-        / _args.granularity
-        / _args.superclass
-        / f"crop_size{str(_args.crop_size)}"
-        / f"dataset_{split}_{_args.granularity}_{_args.superclass}_crop{str(_args.crop_size)}.pt"
-    )
-    fp.parent.mkdir(parents=True, exist_ok=True)
-    print(f"Saving: {fp}")
-    torch.save(data, fp)
