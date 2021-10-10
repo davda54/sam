@@ -193,11 +193,12 @@ def main(_args):
     model_paths = model_paths[: _args.limit]
     model_results = {}
 
-    # TODO: can I speed this up using gpus/multiprocessing
+    # TODO: can I speed this up using gpus/multiprocessing?
     for model_path in tqdm(model_paths, desc="Model evaluations"):
-
+        print(model_path)
         model_filename = parse_model_path(model_path)
         print(model_filename)
+        print(model_filename[0])
 
         (
             granularity,
