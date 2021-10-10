@@ -12,7 +12,9 @@ from tqdm.auto import tqdm
 
 from model.wide_res_net import WideResNet
 from utility.cifar_utils import cifar100_stats
-torch.multiprocessing.set_sharing_strategy('file_system')
+
+torch.multiprocessing.set_sharing_strategy("file_system")
+
 
 def get_project_path() -> Path:
     return Path(__file__).parent.parent
@@ -65,9 +67,12 @@ def find_model_files(model_path=(project_path / "models")):
 
 
 def evaluate(dataloader, model, device):
+    dataset_type = dataloader.dataset.cifar100.meta["type"]
     results = {}
     with torch.no_grad():
-        for inputs, targets, idx in tqdm(dataloader):
+        for inputs, targets, idx in tqdm(
+            dataloader, desc=f"Evaluating {dataset_type} data"
+        ):
             # inputs, targets, idxs = (b.to(device) for b in batch)
             # print(f"Batch idx {batch_idx}, dataset index {idxs}")
             outputs = model(inputs)
@@ -78,7 +83,7 @@ def evaluate(dataloader, model, device):
                 predictions,
                 targets,
                 correct,
-            ]  # TODO: NamedTuple? Dict? Whatever gets this into pandas DF!
+            ]
     return results
 
 
@@ -119,10 +124,12 @@ def main(_args):
     device = torch.device(f"cuda:{_args.gpu}" if torch.cuda.is_available() else "cpu")
 
     test_dataloader = get_test_dataloader()
-    # validation_dataloader = get_validation_dataloader()
+    validation_dataloader = get_validation_dataloader()
 
     model_paths = find_model_files()
 
+    # CROPPING DOWN PATHS DURING DEVELOPMENT
+    model_paths = model_paths[:5]
     model_results = {}
 
     for model_path in tqdm(model_paths, desc="Model evaluations", leave=True):
@@ -153,11 +160,11 @@ def main(_args):
         ]
         model.load_state_dict(model_state_dict)
         model.eval()
+        validation_results = evaluate(validation_dataloader, model, device)
         test_results = evaluate(test_dataloader, model, device)
-        # validation_results = evaluate(validation_dataloader, model, device)
         model_results[model_filename] = {}
+        model_results[model_filename]["validation"] = validation_results
         model_results[model_filename]["test"] = test_results
-        # model_results[model_filename]['validation'] = validation_results
 
     return model_results
 
