@@ -79,7 +79,10 @@ def evaluate(dataloader, model, device):
             outputs = model(inputs)
             predictions = torch.argmax(outputs, 1)
             correct = torch.argmax(outputs, 1) == targets
-            zipped = zip(idxs, zip(*(outputs, predictions, targets, correct,)))
+            zipped = zip(
+                idxs.cpu(),
+                zip(*(outputs.cpu(), predictions.cpu(), targets.cpu(), correct.cpu())),
+            )
             for idx, data in zipped:
                 results[idx] = data
     return results
@@ -133,7 +136,7 @@ def main(_args):
     # TODO: dump results to file after each iteration in this loop
     # TODO: speed this by increasing batch size or use gpus/multiprocessing
     for model_path in tqdm(model_paths, desc="Model evaluations"):
-        model_filename = str(model_path.split("/")[-1])
+        model_filename = str(model_path.split("/")[-1]).replace(".pt", "")
 
         crop_size = int(get_parameter(model_filename, "crop"))
         kernel_size = int(get_parameter(model_filename, "kernel"))
@@ -177,6 +180,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     print("Getting model results")
     model_results = main(args)
-    print("Pickling results to file")
-    pickle.dump(model_results, open(str(project_path / "model_results.pkl"), "wb"))
+    pickle_path = str(project_path / "model_results.pkl")
+    print(f"Pickling results to file: {pickle_path}")
+    pickle.dump(model_results, open(pickle_path, "wb"))
     # save to CSV using pandas
