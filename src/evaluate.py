@@ -69,11 +69,11 @@ def find_model_files(model_path=(project_path / "models")):
 def evaluate(dataloader, model, device):
     dataset_type = dataloader.dataset.cifar100.meta["type"]
     results = {}
-    # currently assumes batch size is 1
     with torch.no_grad():
         for inputs, targets, idxs in tqdm(
             dataloader, desc=f"Evaluating {dataset_type} data"
         ):
+            # TODO: Determine if using cuda device speeds things up here
             # inputs, targets, idxs = (b.to(device) for b in batch)
             # print(f"Batch idx {batch_idx}, dataset index {idxs}")
             outputs = model(inputs)

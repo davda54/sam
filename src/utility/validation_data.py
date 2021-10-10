@@ -67,7 +67,7 @@ def make_validation_dataset():
     validation_dataset.cifar100.data = list(
         compress(validation_dataset.cifar100.data, dataset_mask)
     )  # subset data using mask
-
+    validation_dataset.cifar100.meta["type"] = "validation"
     return validation_dataset
 
 
