@@ -9,6 +9,7 @@ import pandas as pd
 import torch
 import torchvision
 import torchvision.transforms as transforms
+from ptflops import get_model_complexity_info
 from torch.utils.data import DataLoader, Dataset
 from tqdm.auto import tqdm
 
@@ -41,7 +42,8 @@ profile_fields = [
     "width_factor",
     "depth",
     "accuracy",
-    "flops",
+    "macs",
+    "params",
 ]
 Profile = namedtuple("Profile", profile_fields,)
 
@@ -197,6 +199,7 @@ def main(_args):
     from the training set, get 100 images for each superclass
     export as validation set
     """
+    # TODO: Implement code to send things to GPU
     device = torch.device(f"cuda:{_args.gpu}" if torch.cuda.is_available() else "cpu")
 
     test_fine_dataloader = get_test_dataloader(coarse=False)
@@ -257,8 +260,13 @@ def main(_args):
         model.load_state_dict(model_state_dict)
         model.eval()
 
-        # TODO: generate a model profile by calculating the FLOPS
-        flops = 999999
+        macs, params = get_model_complexity_info(
+            model,
+            (3, crop_size, crop_size),
+            as_strings=True,
+            print_per_layer_stat=False,
+            verbose=False,
+        )
 
         validation_results, validation_accuracy = evaluate(
             validation_dataloader, model, "validation"
@@ -271,7 +279,7 @@ def main(_args):
             index_label="index",
         )
 
-        profile_ = Profile(*(params + [validation_accuracy, flops]))
+        profile_ = Profile(*(params + [validation_accuracy, macs, params]))
         profile_df = pd.DataFrame([profile_], columns=profile_fields)
         profile_df.to_csv(profiles_path, mode="a", header=False)
 
