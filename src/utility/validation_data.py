@@ -1,41 +1,13 @@
 import random
 import argparse
 import torch
-import torchvision
 from itertools import compress
 from misc_utils import get_project_root
 import torchvision.transforms as transforms
-from torch.utils.data import DataLoader
-from torchvision.datasets import CIFAR100
+from cifar_utils import CIFAR100Indexed, cifar100_stats
 
-dataset_fp = get_project_root() / "datasets"
-dataset_fp.mkdir(parents=True, exist_ok=True)
-
-
-def dataset_with_indices(cls):
-    """
-    Modifies the given Dataset class to return a tuple data, target, index
-    instead of just data, target.
-    """
-
-    def __getitem__(self, index):
-        data, target = cls.__getitem__(self, index)
-        return data, target, index
-
-    return type(cls.__name__, (cls,), {"__getitem__": __getitem__,})
-
-
-def cifar100_stats():
-    _data_set = torchvision.datasets.CIFAR100(
-        root=str(dataset_fp),
-        train=True,
-        download=True,
-        transform=transforms.ToTensor(),
-    )
-
-    _data_tensors = torch.cat([d[0] for d in DataLoader(_data_set)])
-    mean, std = _data_tensors.mean(dim=[0, 2, 3]), _data_tensors.std(dim=[0, 2, 3])
-    return mean, std
+dataset_path = get_project_root() / "datasets"
+dataset_path.mkdir(parents=True, exist_ok=True)
 
 
 def make_validation_dataset():
@@ -44,21 +16,24 @@ def make_validation_dataset():
     export as validation set
     """
 
-    mean, std = cifar100_stats()
+    mean, std = cifar100_stats(root=str(dataset_path))
 
     validation_transform = transforms.Compose(
         [transforms.ToTensor(), transforms.Normalize(mean, std)]
     )
 
-    validation_dataset = CIFAR100(
-        root=str(dataset_fp), train=True, download=True, transform=validation_transform,
+    validation_dataset = CIFAR100Indexed(
+        root=str(dataset_path),
+        train=True,
+        download=True,
+        transform=validation_transform,
     )
 
     class_numbers = range(100)
     sampled_indices = []
     for cls in class_numbers:
         mask = [
-            t == cls for t in validation_dataset.targets
+            t == cls for t in validation_dataset.cifar100.targets
         ]  # get the indices for targets matching our superclass arg
         indices = [
             i for i, e in enumerate(mask) if e
@@ -69,11 +44,11 @@ def make_validation_dataset():
     for i in sampled_indices:
         dataset_mask[i] = True
 
-    validation_dataset.targets = list(
-        compress(validation_dataset.targets, dataset_mask)
+    validation_dataset.cifar100.targets = list(
+        compress(validation_dataset.cifar100.targets, dataset_mask)
     )  # subset targets using mask
-    validation_dataset.data = list(
-        compress(validation_dataset.data, dataset_mask)
+    validation_dataset.cifar100.data = list(
+        compress(validation_dataset.cifar100.data, dataset_mask)
     )  # subset data using mask
 
     return validation_dataset
@@ -89,7 +64,9 @@ if __name__ == "__main__":
     random.seed(42)
     device = torch.device(f"cuda:{args.gpu}" if torch.cuda.is_available() else "cpu")
     dataset = make_validation_dataset()
-    fp = get_project_root() / "datasets" / "validation" / "validation_dataset.pt"
-    fp.parent.mkdir(parents=True, exist_ok=True)
-    print(f"Saving validation dataset to file path: {fp}")
-    torch.save(dataset, fp)
+    output_path = (
+        get_project_root() / "datasets" / "validation" / "validation_dataset.pt"
+    )
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    print(f"Saving validation dataset to file path: {output_path}")
+    torch.save(dataset, output_path)
