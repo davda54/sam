@@ -126,14 +126,15 @@ def main(_args):
 
     model_paths = find_model_files()
 
-    # TODO: Remove later CROPPING DOWN PATHS DURING DEVELOPMENT
-    model_paths = model_paths[:2]
+    model_paths = model_paths[: _args.limit]
     model_results = {}
 
     # TODO: dump results to file after each iteration in this loop
     # TODO: speed this by increasing batch size or use gpus/multiprocessing
     for model_path in tqdm(model_paths, desc="Model evaluations"):
-        model_filename = str(model_path.split("/")[-1]).replace(".pt", "")
+        model_filename = (
+            str(model_path.split("/")[-1]).replace(".pt", "").replace("model_", "")
+        )
 
         crop_size = int(get_parameter(model_filename, "crop"))
         kernel_size = int(get_parameter(model_filename, "kernel"))
@@ -173,6 +174,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--gpu", default=6, type=int, help="Index of GPU to use",
+    )
+    parser.add_argument(
+        "--limit", default=5, type=int, help="Limit amount for models to evaluate",
     )
     args = parser.parse_args()
     print("Getting model results")
