@@ -281,7 +281,7 @@ def main(_args):
 
         profile_ = Profile(*(params + [validation_accuracy, macs, params]))
         profile_df = pd.DataFrame([profile_], columns=profile_fields)
-        profile_df.to_csv(profiles_path, mode="a", header=False)
+        profile_df.to_csv(profiles_path, mode="a", header=False, index=False)
 
         test_results, _ = evaluate(test_dataloader, model, "test")
         test_df = pd.DataFrame(test_results)
