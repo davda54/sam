@@ -13,7 +13,12 @@ from torch.utils.data import DataLoader, Dataset
 from tqdm.auto import tqdm
 
 from model.wide_res_net import WideResNet
-from utility.cifar_utils import cifar100_stats
+from utility.cifar_utils import (
+    cifar100_stats,
+    coarse_classes,
+    coarse_idxs,
+    fine_to_coarse_idxs,
+)
 
 torch.multiprocessing.set_sharing_strategy("file_system")
 from collections import namedtuple
@@ -143,7 +148,7 @@ def evaluate(dataloader, model, dataset_type):
     return results, accuracy
 
 
-def get_test_dataloader():
+def get_test_dataloader(coarse=False):
     mean, std = cifar100_stats(root=str(dataset_path))
     test_transform = transforms.Compose(
         [transforms.ToTensor(), transforms.Normalize(mean, std)]
@@ -154,6 +159,11 @@ def get_test_dataloader():
 
     test_dataset.cifar100.meta["type"] = "test"
 
+    if coarse:
+        test_dataset.classes = coarse_classes
+        test_dataset.class_to_idx = coarse_idxs
+        test_dataset.targets = list(map(fine_to_coarse_idxs.get, test_dataset.targets))
+
     test_dataloader = torch.utils.data.DataLoader(
         test_dataset, batch_size=1024, shuffle=False, num_workers=10,
     )
@@ -161,11 +171,19 @@ def get_test_dataloader():
     return test_dataloader
 
 
-def get_validation_dataloader():
+def get_validation_dataloader(coarse=False):
     validation_dataset = torch.load(
         dataset_path / "validation" / "validation_dataset.pt"
     )
     validation_dataset.cifar100.meta["type"] = "validation"
+
+    if coarse:
+        validation_dataset.classes = coarse_classes
+        validation_dataset.class_to_idx = coarse_idxs
+        validation_dataset.targets = list(
+            map(fine_to_coarse_idxs.get, validation_dataset.targets)
+        )
+
     validation_dataloader = torch.utils.data.DataLoader(
         validation_dataset, batch_size=1024, shuffle=False, num_workers=10,
     )
@@ -179,8 +197,10 @@ def main(_args):
     """
     device = torch.device(f"cuda:{_args.gpu}" if torch.cuda.is_available() else "cpu")
 
-    test_dataloader = get_test_dataloader()
-    validation_dataloader = get_validation_dataloader()
+    test_fine_dataloader = get_test_dataloader(coarse=False)
+    test_coarse_dataloader = get_test_dataloader(coarse=True)
+    validation_coarse_dataloader = get_validation_dataloader(coarse=False)
+    validation_fine_dataloader = get_validation_dataloader(coarse=False)
 
     model_paths = find_model_files()
 
@@ -211,8 +231,12 @@ def main(_args):
         print(params)
         if granularity == "coarse":
             n_labels = 20
+            test_dataloader = test_coarse_dataloader
+            validation_dataloader = validation_coarse_dataloader
         elif granularity == "fine":
             n_labels = 100
+            test_dataloader = test_fine_dataloader
+            validation_dataloader = validation_fine_dataloader
         else:
             raise ValueError("model filename does not contain granularity")
 
