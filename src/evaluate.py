@@ -1,6 +1,8 @@
 import argparse
+import csv
 import os
-import pickle
+
+# import pickle
 from pathlib import Path
 
 import pandas as pd
@@ -20,19 +22,17 @@ from itertools import compress
 from utility.cifar_utils import coarse_class_to_idx
 
 Result = namedtuple("Result", ["idx", "output", "prediction", "target", "correct"])
-Profile = namedtuple(
-    "Profile",
-    [
-        "granularity",
-        "superclass",
-        "crop_size",
-        "kernel_size",
-        "width_factor",
-        "depth",
-        "accuracy",
-        "flops",
-    ],
-)
+profile_fields = [
+    "granularity",
+    "superclass",
+    "crop_size",
+    "kernel_size",
+    "width_factor",
+    "depth",
+    "accuracy",
+    "flops",
+]
+Profile = namedtuple("Profile", profile_fields,)
 
 
 def get_project_path() -> Path:
@@ -191,7 +191,12 @@ def main(_args):
     model_paths = find_model_files()
 
     model_paths = model_paths[: _args.limit]
-    model_results = {}
+    # model_results = {}
+
+    profiles_path = evaluations_path / "model_profiles.csv"
+    with open(profiles_path, "w", encoding="UTF8") as f:
+        writer = csv.writer(f)
+        writer.writerow(profile_fields)
 
     # TODO: can I speed this up using gpus/multiprocessing?
     for model_path in tqdm(model_paths, desc="Model evaluations"):
@@ -246,9 +251,7 @@ def main(_args):
 
         profile_ = Profile(*(params + [validation_accuracy, flops]))
         profile_df = pd.DataFrame(profile_)
-        profile_df.to_csv(
-            str(evaluations_path / "model_profiles.csv"), mode="a", header=False
-        )
+        profile_df.to_csv(profiles_path, mode="a", header=False)
 
         test_results, _ = evaluate(test_dataloader, model, device)
         test_df = pd.DataFrame(test_results)
