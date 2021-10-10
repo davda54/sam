@@ -195,10 +195,9 @@ def main(_args):
 
     # TODO: can I speed this up using gpus/multiprocessing?
     for model_path in tqdm(model_paths, desc="Model evaluations"):
-        print(model_path)
-        model_filename = parse_model_path(model_path)
+        # print(model_path)
+        model_filename = parse_model_path(model_path)[0] # TODO: Figure out why this is returning a tuple ...
         print(model_filename)
-        print(model_filename[0])
 
         (
             granularity,
