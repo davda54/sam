@@ -97,7 +97,7 @@ def get_test_dataloader():
     test_dataset.cifar100.meta["type"] = "test"
 
     test_dataloader = torch.utils.data.DataLoader(
-        test_dataset, batch_size=1, shuffle=False, num_workers=2,
+        test_dataset, batch_size=128, shuffle=False, num_workers=2,
     )
 
     return test_dataloader
@@ -109,7 +109,7 @@ def get_validation_dataloader():
     )
     validation_dataset.cifar100.meta["type"] = "validation"
     validation_dataloader = torch.utils.data.DataLoader(
-        validation_dataset, batch_size=1, shuffle=False, num_workers=2,
+        validation_dataset, batch_size=128, shuffle=False, num_workers=2,
     )
     return validation_dataloader
 
