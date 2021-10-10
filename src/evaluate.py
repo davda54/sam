@@ -230,8 +230,15 @@ def main(_args):
             depth,
         ) = get_parameters(model_filename)
 
-        params = [granularity, class_id, crop_size, kernel_size, width_factor, depth]
-        print(params)
+        model_info = [
+            granularity,
+            class_id,
+            crop_size,
+            kernel_size,
+            width_factor,
+            depth,
+        ]
+        print(model_info)
         if granularity == "coarse":
             n_labels = 20
             test_dataloader = test_coarse_dataloader
@@ -277,7 +284,7 @@ def main(_args):
             index=False,
         )
 
-        profile_ = Profile(*(params + [validation_accuracy, macs, params]))
+        profile_ = Profile(*(model_info + [validation_accuracy, macs, params]))
         profile_df = pd.DataFrame([profile_], columns=profile_fields)
         profile_df.to_csv(profiles_path, mode="a", header=False, index=False)
 
