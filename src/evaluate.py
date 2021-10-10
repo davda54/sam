@@ -275,8 +275,7 @@ def main(_args):
         validation_df.to_csv(
             path_or_buf=str(
                 evaluations_path / f"validation_eval__{model_filename}.csv"
-            ),
-            index_label="index",
+            ),index=False
         )
 
         profile_ = Profile(*(params + [validation_accuracy, macs, params]))
@@ -287,7 +286,7 @@ def main(_args):
         test_df = pd.DataFrame(test_results)
         test_df.to_csv(
             path_or_buf=str(evaluations_path / f"test_eval__{model_filename}.csv"),
-            index_label="index",
+            index=False
         )
         # model_results[model_filename] = {}
         # model_results[model_filename]["validation"] = validation_results
