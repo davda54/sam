@@ -12,7 +12,7 @@ from tqdm.auto import tqdm
 
 from model.wide_res_net import WideResNet
 from utility.cifar_utils import cifar100_stats
-
+torch.multiprocessing.set_sharing_strategy('file_system')
 
 def get_project_path() -> Path:
     return Path(__file__).parent.parent
