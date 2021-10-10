@@ -14,6 +14,12 @@ from model.wide_res_net import WideResNet
 from utility.cifar_utils import cifar100_stats
 
 torch.multiprocessing.set_sharing_strategy("file_system")
+from collections import namedtuple
+from itertools import compress
+
+from utility.cifar_utils import coarse_class_to_idx
+
+Result = namedtuple("Result", ["idx", "output", "prediction", "target", "correct"])
 
 
 def get_project_path() -> Path:
@@ -29,6 +35,10 @@ def get_granularity(name: str) -> str:
         raise ValueError("granularity not found")
 
 
+def get_superclass(name: str) -> int:
+    pass
+
+
 def get_parameter(name: str, param: str) -> int:
     extension = "." + name.split(".")[-1]
     if param not in ["crop", "kernel", "width", "depth"]:
@@ -36,6 +46,29 @@ def get_parameter(name: str, param: str) -> int:
     for element in name.split("_"):
         if param in element:
             return int(element.replace(param, "").replace(extension, ""))
+
+
+def get_parameters(model_filename):
+    crop_size = int(get_parameter(model_filename, "crop"))
+    kernel_size = int(get_parameter(model_filename, "kernel"))
+    width_factor = int(get_parameter(model_filename, "width"))
+    depth = int(get_parameter(model_filename, "depth"))
+    granularity = get_granularity(model_filename)
+    return crop_size, kernel_size, width_factor, depth, granularity
+
+
+def model_name_from_path(model_path):
+    model_name = str(model_path.split("/")[-1])
+    model_name = model_name.replace(".pt", "").replace("model_", "")
+    model_name = superclass_to_idx(model_name)
+    return model_name
+
+
+def superclass_to_idx(filename: str):
+    keys = coarse_class_to_idx.keys()
+    superclass = next(compress(keys, [k in filename for k in keys]))
+    superclass_idx = coarse_class_to_idx[superclass]
+    return filename.replace(superclass, superclass_idx)
 
 
 class CIFAR100Indexed(Dataset):
@@ -55,6 +88,8 @@ class CIFAR100Indexed(Dataset):
 project_path = get_project_path()
 dataset_path = project_path / "datasets"
 dataset_path.mkdir(parents=True, exist_ok=True)
+evaluations_path = project_path / "evaluations"
+evaluations_path.mkdir(parents=True, exist_ok=True)
 
 
 def find_model_files(model_path=(project_path / "models")):
@@ -68,7 +103,10 @@ def find_model_files(model_path=(project_path / "models")):
 
 def evaluate(dataloader, model, device):
     dataset_type = dataloader.dataset.cifar100.meta["type"]
-    results = {}
+    results = []
+    # total_loss = 0.0
+    total_correct = 0.0
+    count = 0.0
     with torch.no_grad():
         for inputs, targets, idxs in tqdm(
             dataloader, desc=f"Evaluating {dataset_type} data"
@@ -76,13 +114,18 @@ def evaluate(dataloader, model, device):
             # TODO: Determine if using cuda device speeds things up here
             # inputs, targets, idxs = (b.to(device) for b in batch)
             # print(f"Batch idx {batch_idx}, dataset index {idxs}")
+            count += len(inputs)
             outputs = model(inputs)
+            # total_loss += smooth_crossentropy(outputs, targets)
             predictions = torch.argmax(outputs, 1)
             correct = torch.argmax(outputs, 1) == targets
+            total_correct += correct.sum().item()
             zipped = zip(idxs, zip(*(outputs, predictions, targets, correct)),)
             for idx, data in zipped:
-                results[idx.tolist()] = [element.tolist() for element in data]
-    return results
+                result_ = [idx.tolist()] + [d.tolist() for d in data]
+                results.append(Result(*result_))
+    accuracy = total_correct / count
+    return results, accuracy
 
 
 def get_test_dataloader():
@@ -97,7 +140,7 @@ def get_test_dataloader():
     test_dataset.cifar100.meta["type"] = "test"
 
     test_dataloader = torch.utils.data.DataLoader(
-        test_dataset, batch_size=128, shuffle=False, num_workers=2,
+        test_dataset, batch_size=1024, shuffle=False, num_workers=10,
     )
 
     return test_dataloader
@@ -109,7 +152,7 @@ def get_validation_dataloader():
     )
     validation_dataset.cifar100.meta["type"] = "validation"
     validation_dataloader = torch.utils.data.DataLoader(
-        validation_dataset, batch_size=128, shuffle=False, num_workers=2,
+        validation_dataset, batch_size=1024, shuffle=False, num_workers=10,
     )
     return validation_dataloader
 
@@ -129,18 +172,17 @@ def main(_args):
     model_paths = model_paths[: _args.limit]
     model_results = {}
 
-    # TODO: dump results to file after each iteration in this loop
-    # TODO: speed this by increasing batch size or use gpus/multiprocessing
+    # TODO: can I speed this up using gpus/multiprocessing
     for model_path in tqdm(model_paths, desc="Model evaluations"):
-        model_filename = (
-            str(model_path.split("/")[-1]).replace(".pt", "").replace("model_", "")
+
+        model_filename = model_name_from_path(model_path)
+
+        crop_size, kernel_size, width_factor, depth, granularity = get_parameters(
+            model_filename
         )
 
-        crop_size = int(get_parameter(model_filename, "crop"))
-        kernel_size = int(get_parameter(model_filename, "kernel"))
-        width_factor = int(get_parameter(model_filename, "width"))
-        depth = int(get_parameter(model_filename, "depth"))
-        granularity = get_granularity(model_filename)
+        print(model_filename)
+        print(crop_size, kernel_size, width_factor, depth, granularity)
 
         if granularity == "coarse":
             n_labels = 20
@@ -148,6 +190,7 @@ def main(_args):
             n_labels = 100
         else:
             raise ValueError("model filename does not contain granularity")
+
         model = WideResNet(
             kernel_size=kernel_size,
             width_factor=width_factor,
@@ -156,13 +199,29 @@ def main(_args):
             in_channels=3,
             labels=n_labels,
         )
+
         model_state_dict = torch.load(model_path, map_location=f"cuda:{_args.gpu}")[
             "model_state_dict"
         ]
         model.load_state_dict(model_state_dict)
         model.eval()
-        validation_results = evaluate(validation_dataloader, model, device)
-        test_results = evaluate(test_dataloader, model, device)
+
+        # TODO: generate a model profile by calculating the FLOPS
+        # ModelName == [granularity, superclass, crop_size, width, depth]
+        # ModelProfile == ModelName + [accuracy, flops]
+
+        validation_results, validation_accuracy = evaluate(
+            validation_dataloader, model, device
+        )
+        validation_df = pd.DataFrame(validation_results)
+        validation_df.to_csv(
+            path_or_buf=str(evaluations_path / model_filename), index_label="index"
+        )
+        test_results, test_accuracy = evaluate(test_dataloader, model, device)
+        validation_df = pd.DataFrame(validation_results)
+        validation_df.to_csv(
+            path_or_buf=str(evaluations_path / model_filename), index_label="index"
+        )
         model_results[model_filename] = {}
         model_results[model_filename]["validation"] = validation_results
         model_results[model_filename]["test"] = test_results
@@ -184,4 +243,3 @@ if __name__ == "__main__":
     pickle_path = str(project_path / "model_results.pkl")
     print(f"Pickling results to file: {pickle_path}")
     pickle.dump(model_results, open(pickle_path, "wb"))
-    # save to CSV using pandas
