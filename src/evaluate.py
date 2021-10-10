@@ -79,12 +79,9 @@ def evaluate(dataloader, model, device):
             outputs = model(inputs)
             predictions = torch.argmax(outputs, 1)
             correct = torch.argmax(outputs, 1) == targets
-            results[idxs] = [
-                outputs,
-                predictions,
-                targets,
-                correct,
-            ]
+            zipped = zip(idxs, zip(*(outputs, predictions, targets, correct,)))
+            for idx, data in zipped:
+                results[idx] = data
     return results
 
 
