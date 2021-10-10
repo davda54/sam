@@ -12,12 +12,18 @@ from tqdm.auto import tqdm
 
 from model.wide_res_net import WideResNet
 from utility.cifar_utils import cifar100_stats
-from utility.parse_logs import get_granularity, get_superclass
 
 
 def get_project_path() -> Path:
     return Path(__file__).parent.parent
 
+def get_granularity(name: str) -> str:
+    if "coarse" in name:
+        return "coarse"
+    elif "fine" in name:
+        return "fine"
+    else:
+        raise ValueError("granularity not found")
 
 def get_parameter(name: str, param: str) -> int:
     extension = "." + name.split(".")[-1]
