@@ -109,7 +109,7 @@ def get_validation_dataloader():
     validation_dataset = torch.load(
         dataset_path / "validation" / "validation_dataset.pt"
     )
-    validation_dataset.meta["type"] = "validation"
+    validation_dataset.cifar100.meta["type"] = "validation"
     validation_dataloader = torch.utils.data.DataLoader(
         validation_dataset, batch_size=1, shuffle=False, num_workers=2,
     )
