@@ -53,6 +53,7 @@ def save_dataset(data: torchvision.datasets, split: str, _args):
     print(f"Saving: {output_path}")
     torch.save(data, output_path)
 
+
 fine_classes = (  # Strict order DO NOT CHANGE
     "apple",
     "aquarium_fish",
