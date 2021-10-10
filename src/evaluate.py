@@ -160,9 +160,11 @@ def get_test_dataloader(coarse=False):
     test_dataset.cifar100.meta["type"] = "test"
 
     if coarse:
-        test_dataset.classes = coarse_classes
-        test_dataset.class_to_idx = coarse_idxs
-        test_dataset.targets = list(map(fine_to_coarse_idxs.get, test_dataset.targets))
+        test_dataset.cifar100.classes = coarse_classes
+        test_dataset.cifar100.class_to_idx = coarse_idxs
+        test_dataset.cifar100.targets = list(
+            map(fine_to_coarse_idxs.get, test_dataset.cifar100.targets)
+        )
 
     test_dataloader = torch.utils.data.DataLoader(
         test_dataset, batch_size=1024, shuffle=False, num_workers=10,
@@ -178,10 +180,10 @@ def get_validation_dataloader(coarse=False):
     validation_dataset.cifar100.meta["type"] = "validation"
 
     if coarse:
-        validation_dataset.classes = coarse_classes
-        validation_dataset.class_to_idx = coarse_idxs
-        validation_dataset.targets = list(
-            map(fine_to_coarse_idxs.get, validation_dataset.targets)
+        validation_dataset.cifar100.classes = coarse_classes
+        validation_dataset.cifar100.class_to_idx = coarse_idxs
+        validation_dataset.cifar100.targets = list(
+            map(fine_to_coarse_idxs.get, validation_dataset.cifar100.targets)
         )
 
     validation_dataloader = torch.utils.data.DataLoader(
