@@ -42,7 +42,7 @@ def get_superclass(name: str) -> str:
 
 
 def get_parameter(name: str, param: str) -> int:
-    extension = '.' + name.split('.')[-1]
+    extension = "." + name.split(".")[-1]
     if param not in ["crop", "kernel", "width", "depth"]:
         raise ValueError("invalid parameter input")
     for element in name.split("_"):

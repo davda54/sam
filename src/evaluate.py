@@ -14,18 +14,19 @@ from model.wide_res_net import WideResNet
 from utility.cifar_utils import cifar100_stats
 from utility.parse_logs import get_granularity, get_superclass
 
+
 def get_project_path() -> Path:
     return Path(__file__).parent.parent
 
 
 def get_parameter(name: str, param: str) -> int:
-    extension = '.' + name.split('.')[-1]
+    extension = "." + name.split(".")[-1]
     if param not in ["crop", "kernel", "width", "depth"]:
         raise ValueError("invalid parameter input")
     for element in name.split("_"):
         if param in element:
-
             return int(element.replace(param, "").replace(extension, ""))
+
 
 class CIFAR100Indexed(Dataset):
     def __init__(self, root, download, train, transform):
@@ -117,24 +118,22 @@ def main(_args):
     for model_path in tqdm(model_paths, desc="Model evaluations", leave=True):
         model_filename = str(model_path.split("/")[-1])
 
-        # TODO: Parse out the crop/kernel/width/depth from the model's filepath
-        # TODO: Init the model object using the parsed values
-        # TODO: Parse out crop or fine from model fp and assign n_labels
-        int(get_parameter(model_filename, "crop"))
-        int(get_parameter(model_filename, "kernel"))
-        int(get_parameter(model_filename, "width"))
-        int(get_parameter(model_filename, "depth"))
+        crop_size = int(get_parameter(model_filename, "crop"))
+        kernel_size = int(get_parameter(model_filename, "kernel"))
+        width_factor = int(get_parameter(model_filename, "width"))
+        depth = int(get_parameter(model_filename, "depth"))
+        granularity = get_granularity(model_filename)
 
-        if "coarse" in model_filename:
+        if granularity == "coarse":
             n_labels = 20
-        elif "fine" in model_filename:
+        elif granularity == "fine":
             n_labels = 100
         else:
             raise ValueError("model filename does not contain granularity")
         model = WideResNet(
-            kernel_size=_args.kernel_size,
-            width_factor=_args.width_factor,
-            depth=_args.depth,
+            kernel_size=kernel_size,
+            width_factor=width_factor,
+            depth=depth,
             dropout=0.0,
             in_channels=3,
             labels=n_labels,
@@ -146,9 +145,7 @@ def main(_args):
         model.eval()
         test_results = evaluate(model, test_dataloader, device)
         # validation_results = evaluate(validation_dataloader, model, device)
-        model_results[
-            model_filename
-        ] = {}  # TODO: Get the model name and use it to store the results
+        model_results[model_filename] = {}
         model_results[model_filename]["test"] = test_results
         # model_results[model_filename]['validation'] = validation_results
 
