@@ -85,7 +85,7 @@ def superclass_to_idx(filename: str):
     coarse granularity models have their generic term removed
     """
     if "all_" in filename:  # if coarse just removes the superclass placeholder
-        return filename.replace("all_", ""), None
+        return filename.replace("all_", "")
     keys = coarse_class_to_idx.keys()
     superclass = next(compress(keys, [k in filename for k in keys]))
     superclass_idx = coarse_class_to_idx[superclass]
@@ -196,7 +196,7 @@ def main(_args):
     # TODO: can I speed this up using gpus/multiprocessing?
     for model_path in tqdm(model_paths, desc="Model evaluations"):
         # print(model_path)
-        model_filename = parse_model_path(model_path)[0] # TODO: Figure out why this is returning a tuple ...
+        model_filename = parse_model_path(model_path)
         print(model_filename)
 
         (
