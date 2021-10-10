@@ -17,6 +17,7 @@ from utility.cifar_utils import cifar100_stats
 def get_project_path() -> Path:
     return Path(__file__).parent.parent
 
+
 def get_granularity(name: str) -> str:
     if "coarse" in name:
         return "coarse"
@@ -24,6 +25,7 @@ def get_granularity(name: str) -> str:
         return "fine"
     else:
         raise ValueError("granularity not found")
+
 
 def get_parameter(name: str, param: str) -> int:
     extension = "." + name.split(".")[-1]
