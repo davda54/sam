@@ -345,7 +345,7 @@ if __name__ == "__main__":
         "--gpu", default=6, type=int, help="Index of GPU to use",
     )
     parser.add_argument(
-        "--limit", default=5, type=int, help="Limit amount for models to evaluate",
+        "--limit", default=None, type=int, help="Limit amount for models to evaluate",
     )
     args = parser.parse_args()
     print("Getting model results")
