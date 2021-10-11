@@ -108,7 +108,7 @@ def set_crop_size(dataloader, crop_size: int):
         if type(t) == torchvision.transforms.transforms.RandomCrop:
             dataloader.dataset.cifar100.transforms.transform.transforms[
                 i
-            ].size = crop_size
+            ].size = (crop_size,crop_size)
 
 
 class CIFAR100Indexed(Dataset):
