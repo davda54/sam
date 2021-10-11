@@ -161,7 +161,7 @@ def evaluate(dataloader, model, device, dataset_type):
     return results, accuracy
 
 
-def split_outputs_column(df: pd.DataFrame):
+def split_outputs_column(df: pd.DataFrame, n_outputs: int):
     """
     Split the array elements in the `outputs` column into individual columns in pandas
     :param df: DataFrame containing an outputs column
@@ -169,7 +169,7 @@ def split_outputs_column(df: pd.DataFrame):
     """
     # new df from the column of lists
     outputs_df = pd.DataFrame(
-        df["outputs"].tolist(), columns=[f"output{i}" for i in range(n_labels)],
+        df["outputs"].tolist(), columns=[f"output{i}" for i in range(n_outputs)],
     )
     # attach output columns back to df
     df = pd.concat([df, outputs_df], axis=1)
@@ -314,7 +314,7 @@ def main(_args):
             validation_dataloader, model, device, "validation"
         )
         validation_df = pd.DataFrame(validation_results)
-        validation_df = split_outputs_column(validation_df)
+        validation_df = split_outputs_column(validation_df, n_labels)
 
         validation_df.to_csv(
             path_or_buf=str(
@@ -329,7 +329,7 @@ def main(_args):
 
         test_results, _ = evaluate(test_dataloader, model, device, "test")
         test_df = pd.DataFrame(test_results)
-        test_df = split_outputs_column(test_df)
+        test_df = split_outputs_column(test_df, n_labels)
         test_df.to_csv(
             path_or_buf=str(evaluations_path / f"test_eval__{model_filename}.csv"),
             index=False,
