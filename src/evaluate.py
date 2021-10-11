@@ -282,8 +282,8 @@ def main(_args):
 
         # TODO: Set crop size from the model
         # Sets the crop size on the RandomCrop transform to fit the model
-        # set_crop_size(test_dataloader, crop_size)
-        # set_crop_size(validation_dataloader, crop_size)
+        set_crop_size(test_dataloader, crop_size)
+        set_crop_size(validation_dataloader, crop_size)
 
         # TODO: Set the dataloader's batch size based on the crop size to increase evaluation speed
 
