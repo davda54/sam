@@ -307,7 +307,7 @@ def main(_args):
         profile_df = pd.DataFrame([profile_], columns=profile_fields)
         # TODO: Split the array elements in the `outputs` column into individual columns in pandas
         # new df from the column of lists
-        outputs_df = profile_df.DataFrame(
+        outputs_df = pd.DataFrame(
             profile_df["outputs"].tolist(),
             columns=[f"output{i}" for i in range(n_labels)],
         )
