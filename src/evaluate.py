@@ -303,6 +303,14 @@ def main(_args):
         model.cuda(device)
         model.eval()
 
+        test_results, _ = evaluate(test_dataloader, model, device, "test")
+        test_df = pd.DataFrame(test_results)
+        test_df = split_outputs_column(test_df, n_labels)
+        test_df.to_csv(
+            path_or_buf=str(evaluations_path / f"test_eval__{model_filename}.csv"),
+            index=False,
+        )
+
         macs, params = get_model_complexity_info(
             model,
             (3, crop_size, crop_size),
@@ -328,14 +336,6 @@ def main(_args):
         profile_ = Profile(*(model_info + [validation_accuracy, macs, flops, params]))
         profile_df = pd.DataFrame([profile_], columns=profile_fields)
         profile_df.to_csv(profiles_path, mode="a", header=False, index=False)
-
-        test_results, _ = evaluate(test_dataloader, model, device, "test")
-        test_df = pd.DataFrame(test_results)
-        test_df = split_outputs_column(test_df, n_labels)
-        test_df.to_csv(
-            path_or_buf=str(evaluations_path / f"test_eval__{model_filename}.csv"),
-            index=False,
-        )
 
 
 if __name__ == "__main__":
