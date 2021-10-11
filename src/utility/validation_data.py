@@ -37,13 +37,17 @@ def make_validation_dataset():
 
     # TODO: Add a random crop layer and make it equal to crop_size from the model
     validation_transform = transforms.Compose(
-        [transforms.ToTensor(), transforms.Normalize(mean, std)]
+        [
+            transforms.RandomCrop(size=32),
+            transforms.ToTensor(),
+            transforms.Normalize(mean, std),
+        ]
     )
 
     validation_dataset = CIFAR100Indexed(
         root=str(dataset_path),
         train=True,
-        download=True,
+        download=False,
         transform=validation_transform,
     )
 

@@ -31,7 +31,7 @@ dataset_path.mkdir(parents=True, exist_ok=True)
 evaluations_path = project_path / "evaluations"
 evaluations_path.mkdir(parents=True, exist_ok=True)
 
-Result = namedtuple("Result", ["idx", "output", "prediction", "target", "correct"])
+Result = namedtuple("Result", ["idx", "prediction", "target", "correct", "outputs"])
 profile_fields = [
     "granularity",
     "superclass",
@@ -100,6 +100,15 @@ def superclass_to_idx(filename: str):
     return filename.replace(superclass, "class" + str(superclass_idx))
 
 
+def set_crop_size(dataloader, crop_size: int):
+    """
+    takes in a dataloader containing dataset CIFAR100Indexed and sets size of the RandomCrop
+    """
+    for i, t in enumerate(dataloader.cifar100.transforms.transform.transforms):
+        if type(t) == torchvision.transforms.transforms.RandomCrop:
+            dataloader.cifar100.transforms.transform.transforms[i].size = crop_size
+
+
 class CIFAR100Indexed(Dataset):
     def __init__(self, root, download, train, transform):
         self.cifar100 = torchvision.datasets.CIFAR100(
@@ -141,7 +150,7 @@ def evaluate(dataloader, model, device, dataset_type):
             total_correct += correct.sum().item()
             zipped = zip(
                 idxs,
-                zip(*(outputs.cpu(), predictions.cpu(), targets.cpu(), correct.cpu())),
+                zip(*(predictions.cpu(), targets.cpu(), correct.cpu(), outputs.cpu())),
             )
             for idx, data in zipped:
                 result_ = [idx.tolist()] + [d.tolist() for d in data]
@@ -154,7 +163,11 @@ def get_test_dataloader(coarse=False):
     mean, std = cifar100_stats(root=str(dataset_path))
     # TODO: Add a random crop layer and make it equal to crop_size from the model
     test_transform = transforms.Compose(
-        [transforms.ToTensor(), transforms.Normalize(mean, std)]
+        [
+            transforms.RandomCrop(size=32),
+            transforms.ToTensor(),
+            transforms.Normalize(mean, std),
+        ]
     )
     test_dataset = CIFAR100Indexed(
         root=str(dataset_path), train=False, download=False, transform=test_transform,
@@ -210,7 +223,6 @@ def main(_args):
     model_paths = find_model_files()
 
     model_paths = model_paths[: _args.limit]
-    # model_results = {}
 
     profiles_path = evaluations_path / "model_profiles.csv"
     with open(profiles_path, "w", encoding="UTF8") as f:
@@ -219,7 +231,6 @@ def main(_args):
 
     # TODO: Can I speed this up using multiprocessing?
     for model_path in tqdm(model_paths, desc="Model evaluations"):
-        # print(model_path)
         model_filename = parse_model_path(model_path)
         print(model_filename)
 
@@ -251,6 +262,10 @@ def main(_args):
             validation_dataloader = validation_fine_dataloader
         else:
             raise ValueError("model filename does not contain granularity")
+
+        # Sets the crop size on the RandomCrop transform to fit the model
+        set_crop_size(test_dataloader, crop_size)
+        set_crop_size(validation_dataloader, crop_size)
 
         model = WideResNet(
             kernel_size=kernel_size,
@@ -290,6 +305,17 @@ def main(_args):
 
         profile_ = Profile(*(model_info + [validation_accuracy, macs, flops, params]))
         profile_df = pd.DataFrame([profile_], columns=profile_fields)
+        # TODO: Split the array elements in the `outputs` column into individual columns in pandas
+        # new df from the column of lists
+        outputs_df = profile_df.DataFrame(
+            profile_df["outputs"].tolist(),
+            columns=[f"output{i}" for i in range(n_labels)],
+        )
+        # attach output columns back to df
+        profile_df = pd.concat([profile_df, outputs_df], axis=1)
+        profile_df = profile_df.drop(
+            "outputs", axis=1
+        )  # drop the original outputs column
         profile_df.to_csv(profiles_path, mode="a", header=False, index=False)
 
         test_results, _ = evaluate(test_dataloader, model, device, "test")

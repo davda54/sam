@@ -37,7 +37,7 @@ def make_cifar100(_arg):
 
     train_transform = transforms.Compose(
         [
-            torchvision.transforms.RandomCrop(size=(crop_size, crop_size), padding=4),
+            torchvision.transforms.RandomCrop(size=crop_size, padding=4),
             torchvision.transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
             transforms.Normalize(mean, std),
