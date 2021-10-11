@@ -318,7 +318,7 @@ def main(_args):
             print_per_layer_stat=False,
             verbose=False,
         )
-        flops = f"{2*(macs.split(' ')[0])} GFLOPs"
+        flops = f"{2*int(macs.split(' ')[0])} GFLOPs"
 
         validation_results, validation_accuracy = evaluate(
             validation_dataloader, model, device, "validation"
