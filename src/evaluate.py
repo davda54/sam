@@ -182,7 +182,7 @@ def get_test_dataloader(coarse=False):
     # TODO: Add a random crop layer and make it equal to crop_size from the model
     test_transform = transforms.Compose(
         [
-            transforms.RandomCrop(size=32),
+            transforms.RandomCrop(size=(32, 32)),
             transforms.ToTensor(),
             transforms.Normalize(mean, std),
         ]
@@ -201,7 +201,7 @@ def get_test_dataloader(coarse=False):
         )
 
     test_dataloader = torch.utils.data.DataLoader(
-        test_dataset, batch_size=1024, shuffle=False, num_workers=10,
+        test_dataset, batch_size=1024, shuffle=False, num_workers=2,
     )
 
     return test_dataloader
@@ -221,7 +221,7 @@ def get_validation_dataloader(coarse=False):
         )
 
     validation_dataloader = torch.utils.data.DataLoader(
-        validation_dataset, batch_size=1024, shuffle=False, num_workers=10,
+        validation_dataset, batch_size=1024, shuffle=False, num_workers=2,
     )
     return validation_dataloader
 
@@ -284,6 +284,7 @@ def main(_args):
         # Sets the crop size on the RandomCrop transform to fit the model
         set_crop_size(test_dataloader, crop_size)
         set_crop_size(validation_dataloader, crop_size)
+        # TODO: Set the dataloader's batch size based on the crop size to increase evaluation speed
 
         model = WideResNet(
             kernel_size=kernel_size,

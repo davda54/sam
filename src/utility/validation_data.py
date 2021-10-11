@@ -38,7 +38,7 @@ def make_validation_dataset():
     # TODO: Add a random crop layer and make it equal to crop_size from the model
     validation_transform = transforms.Compose(
         [
-            transforms.RandomCrop(size=32),
+            transforms.RandomCrop(size=(32, 32)),
             transforms.ToTensor(),
             transforms.Normalize(mean, std),
         ]
