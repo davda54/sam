@@ -106,9 +106,10 @@ def set_crop_size(dataloader, crop_size: int):
     """
     for i, t in enumerate(dataloader.dataset.cifar100.transforms.transform.transforms):
         if type(t) == torchvision.transforms.transforms.RandomCrop:
-            dataloader.dataset.cifar100.transforms.transform.transforms[
-                i
-            ].size = (crop_size,crop_size)
+            dataloader.dataset.cifar100.transforms.transform.transforms[i].size = (
+                crop_size,
+                crop_size,
+            )
 
 
 class CIFAR100Indexed(Dataset):
@@ -318,7 +319,7 @@ def main(_args):
             print_per_layer_stat=False,
             verbose=False,
         )
-        flops = f"{2*int(macs.split(' ')[0])} GFLOPs"
+        flops = f"{2*float(macs.split(' ')[0])} GFLOPs"
 
         validation_results, validation_accuracy = evaluate(
             validation_dataloader, model, device, "validation"
