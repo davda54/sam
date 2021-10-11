@@ -122,7 +122,7 @@ def find_model_files(model_path=(project_path / "models")):
     return model_files
 
 
-def evaluate(dataloader, model, dataset_type):
+def evaluate(dataloader, model, device, dataset_type):
     results = []
     # total_loss = 0.0
     total_correct = 0.0
@@ -132,15 +132,17 @@ def evaluate(dataloader, model, dataset_type):
             dataloader, desc=f"Evaluating {dataset_type} data"
         ):
             # TODO: Determine if using cuda device speeds things up here
-            # inputs, targets, idxs = (b.to(device) for b in batch)
-            # print(f"Batch idx {batch_idx}, dataset index {idxs}")
+            inputs, targets = inputs.to(device), targets.to(device)
             count += len(inputs)
             outputs = model(inputs)
             # total_loss += smooth_crossentropy(outputs, targets)
             predictions = torch.argmax(outputs, 1)
-            correct = torch.argmax(outputs, 1) == targets
+            correct = predictions == targets
             total_correct += correct.sum().item()
-            zipped = zip(idxs, zip(*(outputs, predictions, targets, correct)),)
+            zipped = zip(
+                idxs,
+                zip(*(outputs.cpu(), predictions.cpu(), targets.cpu(), correct.cpu())),
+            )
             for idx, data in zipped:
                 result_ = [idx.tolist()] + [d.tolist() for d in data]
                 results.append(Result(*result_))
@@ -150,6 +152,7 @@ def evaluate(dataloader, model, dataset_type):
 
 def get_test_dataloader(coarse=False):
     mean, std = cifar100_stats(root=str(dataset_path))
+    # TODO: Add a random crop layer and make it equal to crop_size from the model
     test_transform = transforms.Compose(
         [transforms.ToTensor(), transforms.Normalize(mean, std)]
     )
@@ -197,7 +200,6 @@ def main(_args):
     from the training set, get 100 images for each superclass
     export as validation set
     """
-    # TODO: Implement code to send things to GPU
     device = torch.device(f"cuda:{_args.gpu}" if torch.cuda.is_available() else "cpu")
 
     test_fine_dataloader = get_test_dataloader(coarse=False)
@@ -263,6 +265,7 @@ def main(_args):
             "model_state_dict"
         ]
         model.load_state_dict(model_state_dict)
+        model.cuda(device)
         model.eval()
 
         macs, params = get_model_complexity_info(
@@ -273,8 +276,10 @@ def main(_args):
             verbose=False,
         )
 
+        # TODO convert macs to flops, put flops in the output
+
         validation_results, validation_accuracy = evaluate(
-            validation_dataloader, model, "validation"
+            validation_dataloader, model, device, "validation"
         )
         validation_df = pd.DataFrame(validation_results)
         validation_df.to_csv(
@@ -288,7 +293,7 @@ def main(_args):
         profile_df = pd.DataFrame([profile_], columns=profile_fields)
         profile_df.to_csv(profiles_path, mode="a", header=False, index=False)
 
-        test_results, _ = evaluate(test_dataloader, model, "test")
+        test_results, _ = evaluate(test_dataloader, model, device, "test")
         test_df = pd.DataFrame(test_results)
         test_df.to_csv(
             path_or_buf=str(evaluations_path / f"test_eval__{model_filename}.csv"),

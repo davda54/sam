@@ -35,6 +35,7 @@ def make_validation_dataset():
 
     mean, std = cifar100_stats(root=str(dataset_path))
 
+    # TODO: Add a random crop layer and make it equal to crop_size from the model
     validation_transform = transforms.Compose(
         [transforms.ToTensor(), transforms.Normalize(mean, std)]
     )
