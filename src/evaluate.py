@@ -179,10 +179,9 @@ def split_outputs_column(df: pd.DataFrame, n_outputs: int):
 
 def get_test_dataloader(coarse=False):
     mean, std = cifar100_stats(root=str(dataset_path))
-    # TODO: Add a random crop layer and make it equal to crop_size from the model
     test_transform = transforms.Compose(
         [
-            transforms.RandomCrop(size=(32, 32)),
+            transforms.RandomCrop(size=32),
             transforms.ToTensor(),
             transforms.Normalize(mean, std),
         ]
@@ -281,9 +280,11 @@ def main(_args):
         else:
             raise ValueError("model filename does not contain granularity")
 
+        # TODO: Set crop size from the model
         # Sets the crop size on the RandomCrop transform to fit the model
-        set_crop_size(test_dataloader, crop_size)
-        set_crop_size(validation_dataloader, crop_size)
+        # set_crop_size(test_dataloader, crop_size)
+        # set_crop_size(validation_dataloader, crop_size)
+
         # TODO: Set the dataloader's batch size based on the crop size to increase evaluation speed
 
         model = WideResNet(
