@@ -50,7 +50,7 @@ def make_cifar100(_arg):
     )
 
     _train_set = torchvision.datasets.CIFAR100(
-        root=str(cifar100), train=True, download=True, transform=train_transform,
+        root=str(cifar100), train=True, download=False, transform=train_transform,
     )
 
     _test_set = torchvision.datasets.CIFAR100(
