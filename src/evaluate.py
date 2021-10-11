@@ -92,7 +92,7 @@ def superclass_to_idx(filename: str):
     output is model filename with the superclass label name replaced with index
     coarse granularity models have their generic term removed
     """
-    if "all_" in filename:  # if coarse just removes the superclass placeholder
+    if "_all_" in filename:  # if coarse just removes the superclass placeholder
         return filename.replace("_all_", "_class-1_")
     keys = coarse_class_to_idx.keys()
     superclass = next(compress(keys, [k in filename for k in keys]))
