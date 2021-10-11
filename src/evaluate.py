@@ -106,7 +106,9 @@ def set_crop_size(dataloader, crop_size: int):
     """
     for i, t in enumerate(dataloader.dataset.cifar100.transforms.transform.transforms):
         if type(t) == torchvision.transforms.transforms.RandomCrop:
-            dataloader.dataset.cifar100.transforms.transform.transforms[i].size = crop_size
+            dataloader.dataset.cifar100.transforms.transform.transforms[
+                i
+            ].size = crop_size
 
 
 class CIFAR100Indexed(Dataset):
@@ -157,6 +159,22 @@ def evaluate(dataloader, model, device, dataset_type):
                 results.append(Result(*result_))
     accuracy = total_correct / count
     return results, accuracy
+
+
+def split_outputs_column(df: pd.DataFrame):
+    """
+    Split the array elements in the `outputs` column into individual columns in pandas
+    :param df: DataFrame containing an outputs column
+    :return: DataFrame with the outputs column split by element
+    """
+    # new df from the column of lists
+    outputs_df = pd.DataFrame(
+        df["outputs"].tolist(), columns=[f"output{i}" for i in range(n_labels)],
+    )
+    # attach output columns back to df
+    df = pd.concat([df, outputs_df], axis=1)
+    df = df.drop("outputs", axis=1)  # drop the original outputs column
+    return df
 
 
 def get_test_dataloader(coarse=False):
@@ -296,6 +314,8 @@ def main(_args):
             validation_dataloader, model, device, "validation"
         )
         validation_df = pd.DataFrame(validation_results)
+        validation_df = split_outputs_column(validation_df)
+
         validation_df.to_csv(
             path_or_buf=str(
                 evaluations_path / f"validation_eval__{model_filename}.csv"
@@ -305,21 +325,11 @@ def main(_args):
 
         profile_ = Profile(*(model_info + [validation_accuracy, macs, flops, params]))
         profile_df = pd.DataFrame([profile_], columns=profile_fields)
-        # TODO: Split the array elements in the `outputs` column into individual columns in pandas
-        # new df from the column of lists
-        outputs_df = pd.DataFrame(
-            profile_df["outputs"].tolist(),
-            columns=[f"output{i}" for i in range(n_labels)],
-        )
-        # attach output columns back to df
-        profile_df = pd.concat([profile_df, outputs_df], axis=1)
-        profile_df = profile_df.drop(
-            "outputs", axis=1
-        )  # drop the original outputs column
         profile_df.to_csv(profiles_path, mode="a", header=False, index=False)
 
         test_results, _ = evaluate(test_dataloader, model, device, "test")
         test_df = pd.DataFrame(test_results)
+        test_df = split_outputs_column(test_df)
         test_df.to_csv(
             path_or_buf=str(evaluations_path / f"test_eval__{model_filename}.csv"),
             index=False,
