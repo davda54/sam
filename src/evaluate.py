@@ -142,7 +142,7 @@ def evaluate(dataloader, model, device, dataset_type):
     count = 0.0
     with torch.no_grad():
         for inputs, targets, idxs in tqdm(
-            dataloader, desc=f"Evaluating {dataset_type} data"
+            dataloader, desc=f"Evaluating {dataset_type} data", leave=False
         ):
             inputs, targets = inputs.to(device), targets.to(device)
             count += len(inputs)
@@ -248,7 +248,7 @@ def main(_args):
         writer.writerow(profile_fields)
 
     # TODO: Can I speed this up using multiprocessing?
-    for model_path in tqdm(model_paths, desc="Model evaluations"):
+    for model_path in tqdm(model_paths, desc="Model evaluations", leave=False):
         model_filename = parse_model_path(model_path)
         print(model_filename)
 
