@@ -41,6 +41,7 @@ profile_fields = [
     "depth",
     "accuracy",
     "macs",
+    "flops",
     "params",
 ]
 Profile = namedtuple("Profile", profile_fields,)
@@ -217,7 +218,7 @@ def main(_args):
         writer = csv.writer(f)
         writer.writerow(profile_fields)
 
-    # TODO: can I speed this up using gpus/multiprocessing?
+    # TODO: Can I speed this up using multiprocessing?
     for model_path in tqdm(model_paths, desc="Model evaluations"):
         # print(model_path)
         model_filename = parse_model_path(model_path)
@@ -275,8 +276,7 @@ def main(_args):
             print_per_layer_stat=False,
             verbose=False,
         )
-
-        # TODO convert macs to flops, put flops in the output
+        flops = f"2*(macs.split(' ')[0]) GFLOPs"
 
         validation_results, validation_accuracy = evaluate(
             validation_dataloader, model, device, "validation"
@@ -289,7 +289,7 @@ def main(_args):
             index=False,
         )
 
-        profile_ = Profile(*(model_info + [validation_accuracy, macs, params]))
+        profile_ = Profile(*(model_info + [validation_accuracy, macs, flops, params]))
         profile_df = pd.DataFrame([profile_], columns=profile_fields)
         profile_df.to_csv(profiles_path, mode="a", header=False, index=False)
 
