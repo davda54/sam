@@ -56,8 +56,8 @@ def make_cifar100(_arg):
     _test_set = torchvision.datasets.CIFAR100(
         root=str(cifar100), train=False, download=False, transform=test_transform,
     )
-
-    if use_fine_classes:  # TODO: Make a function that selects the desired superclass
+    # TODO: Make a function that selects the desired superclass
+    if use_fine_classes:
         coarse_idx = coarse_class_to_idx[
             superclass
         ]  # Get the idx for the superclass we want to subset
@@ -97,6 +97,9 @@ if __name__ == "__main__":
         type=int,
         help="Crop size used in data transformations.",
     )
+    parser.add_argument(
+        "--gpu", default=7, type=int, help="Index of GPU to use",
+    )
     args = parser.parse_args()
     print(args)
 
@@ -112,8 +115,7 @@ if __name__ == "__main__":
         if not args.superclass:
             superclass = "all"
 
-    # TODO need to use environmental variables instead of this method to distribute w/ shell commands
-    device = torch.device("cuda:7" if torch.cuda.is_available() else "cpu")
+    device = torch.device(f"cuda:{args.gpu}" if torch.cuda.is_available() else "cpu")
 
     random.seed(42)
     train_set, test_set = make_cifar100(args)

@@ -20,7 +20,6 @@ def get_project_root() -> Path:
     return Path(__file__).parent.parent
 
 
-# TODO: Check if sys.path.append is nessecary
 import sys
 
 sys.path.append(get_project_root)
@@ -229,7 +228,6 @@ if __name__ == "__main__":
                 loss = smooth_crossentropy(predictions, targets)
                 batch_loss = loss.sum().item()
                 epoch_loss += batch_loss
-                # TODO Export the accuracy
                 correct = torch.argmax(predictions, 1) == targets
                 batch_correct = correct.sum().item()
                 epoch_correct += batch_correct
@@ -251,10 +249,7 @@ if __name__ == "__main__":
                     "loss": epoch_loss,
                     "correct": epoch_correct,
                     "size": epoch_count,
-                    "accuracy": epoch_correct / epoch_count
-                    # TODO: ROC AUC metrics
+                    "accuracy": epoch_correct / epoch_count,
                 },
                 str(fp),
             )
-
-# TODO: Functionalize save_model and load_model

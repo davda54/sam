@@ -132,7 +132,6 @@ def evaluate(dataloader, model, device, dataset_type):
         for inputs, targets, idxs in tqdm(
             dataloader, desc=f"Evaluating {dataset_type} data"
         ):
-            # TODO: Determine if using cuda device speeds things up here
             inputs, targets = inputs.to(device), targets.to(device)
             count += len(inputs)
             outputs = model(inputs)
