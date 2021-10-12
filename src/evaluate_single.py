@@ -171,7 +171,7 @@ def evaluate(dataloader, model, device, dataset_type: str):
             # Data munging for embeddings
             embeds_zip = zip(idxs, embeds.cpu())
             for idx, embed in embeds_zip:
-                model_embeddings[idx] = embed
+                model_embeddings[idx.tolist()] = embed.tolist()
     accuracy = total_correct / count
     return model_results, accuracy, model_embeddings
 
@@ -262,7 +262,8 @@ def main(_args):
         writer.writerow(profile_fields)
 
     model_path = _args.model_path
-    model_filename = parse_model_path(_args.model_path)
+    print(model_path)
+    model_filename = parse_model_path(str(model_path))
 
     print(model_filename)
 
