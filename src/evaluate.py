@@ -324,7 +324,7 @@ def main(_args):
         test_df = pd.DataFrame(test_results)
         test_df = split_outputs_column(test_df, n_labels)
         test_df.to_csv(
-            path_or_buf=str(predictions_path / f"test_predicts__{model_filename}.csv"),
+            path_or_buf=str(predictions_path / f"test_eval__{model_filename}.csv"),
             index=False,
         )
         import pickle
@@ -356,7 +356,7 @@ def main(_args):
         validation_df = split_outputs_column(validation_df, n_labels)
         validation_df.to_csv(
             path_or_buf=str(
-                predictions_path / f"validation_predicts__{model_filename}.csv"
+                predictions_path / f"validation_eval__{model_filename}.csv"
             ),
             index=False,
         )
