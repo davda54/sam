@@ -1,14 +1,13 @@
 #!/bin/sh
 
 cr=8
-kr=2
 dp=16
-wd=10
-gpu=2
+wd=2
+gpu=0
 
 mkdir -p "logs/model/coarse/all/crop${cr}/kernel${kr}/depth${dp}/width${wd}/"
 python -u src/train.py --gpu $gpu \
   --coarse_classes \
-  --crop_size $cr --kernel_size $kr \
+  --crop_size $cr\
   --depth $dp --width_factor $wd |
   tee "logs/model/coarse/all/crop${cr}/kernel${kr}/depth${dp}/width${wd}/model_coarse_all_crop${cr}_kernel${kr}_depth${dp}_width${wd}.log"
