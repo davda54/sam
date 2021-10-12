@@ -11,7 +11,7 @@ super_classes=("aquatic_mammals" "fish" "flowers" "food_containers" "fruit_and_v
 "people" "reptiles" "small_mammals" "trees" "vehicles_1" "vehicles_2")
 
 for sc in "${super_classes[@]}"; do
-  mkdir -p logs/model/fine/${sc}/crop${cr}/kernel${kr}/depth${dp}/width${wd}/
+  mkdir -p "logs/model/fine/${sc}/crop${cr}/kernel${kr}/depth${dp}/width${wd}/"
   python -u src/train.py --gpu $gpu \
   --fine_classes --superclass $sc \
   --crop_size $cr --kernel_size $kr \
