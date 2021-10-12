@@ -7,17 +7,18 @@ depth_options=(16)
 width_options=(2)
 
 for i in "${!crop_options[@]}"; do
-    cr="${crop_options[i]}"; kr="${kernel_options[i]}"
-    for dp in "${depth_options[@]}"; do
-      for wd in "${width_options[@]}"; do
-        python -u src/train.py \
+  cr="${crop_options[i]}"
+  kr="${kernel_options[i]}"
+  for dp in "${depth_options[@]}"; do
+    for wd in "${width_options[@]}"; do
+      python -u src/train.py \
         --gpu $gpu \
         --coarse_classes \
         --crop_size $cr \
         --kernel_size $kr \
         --depth $dp \
-        --width_factor $wd  \
-        | tee "logs/model/coarse/all/crop${cr}/kernel${kr}/depth${dp}/width${wd}/model_coarse_all_crop${cr}_kernel${kr}_depth${dp}_width${wd}.log"
+        --width_factor $wd |
+        tee "logs/model/coarse/all/crop${cr}/kernel${kr}/depth${dp}/width${wd}/model_coarse_all_crop${cr}_kernel${kr}_depth${dp}_width${wd}.log"
     done
   done
 done
