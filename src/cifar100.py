@@ -1,6 +1,7 @@
 import argparse
 import random
 from itertools import compress
+from pathlib import Path
 
 import torch
 import torchvision
@@ -16,15 +17,15 @@ from utility.cifar_utils import (
     save_dataset,
 )
 from utility.cutout import Cutout
-from pathlib import Path
+
 
 def get_project_root() -> Path:
     return Path(__file__).parent.parent
 
+
 def make_cifar100(_arg):
-    use_fine_classes, crop_size, superclass = (
+    use_fine_classes, superclass = (
         _arg.use_fine_classes,
-        _arg.crop_size,
         _arg.superclass,
     )
     cifar100 = get_project_root() / "datasets"
@@ -39,7 +40,7 @@ def make_cifar100(_arg):
 
     train_transform = transforms.Compose(
         [
-            torchvision.transforms.RandomCrop(size=crop_size, padding=4),
+            torchvision.transforms.RandomCrop(size=32, padding=4),
             torchvision.transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
             transforms.Normalize(mean, std),
@@ -92,12 +93,6 @@ if __name__ == "__main__":
     parser.set_defaults(use_fine_classes=True)
     parser.add_argument(
         "--superclass", default="all", type=str, help="Superclass we want to use",
-    )
-    parser.add_argument(
-        "--crop_size",
-        default=32,
-        type=int,
-        help="Crop size used in data transformations.",
     )
     args = parser.parse_args()
     print(args)

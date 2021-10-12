@@ -12,6 +12,7 @@ from torch.utils.data import DataLoader, Dataset
 from tqdm.auto import tqdm
 
 from model.wide_res_net import WideResNet
+from src.train import set_crop_size
 from utility.cifar_utils import (
     cifar100_stats,
     coarse_classes,
@@ -98,18 +99,6 @@ def superclass_to_idx(filename: str):
     superclass = next(compress(keys, [k in filename for k in keys]))
     superclass_idx = coarse_class_to_idx[superclass]
     return filename.replace(superclass, "class" + str(superclass_idx))
-
-
-def set_crop_size(dataloader, crop_size: int):
-    """
-    takes in a dataloader containing dataset CIFAR100Indexed and sets size of the RandomCrop
-    """
-    for i, t in enumerate(dataloader.dataset.cifar100.transforms.transform.transforms):
-        if type(t) == torchvision.transforms.transforms.RandomCrop:
-            dataloader.dataset.cifar100.transforms.transform.transforms[i].size = (
-                crop_size,
-                crop_size,
-            )
 
 
 class CIFAR100Indexed(Dataset):
@@ -287,6 +276,7 @@ def main(_args):
             depth,
         ]
         print(model_info)
+
         if granularity == "coarse":
             n_labels = 20
             test_dataloader = test_coarse_dataloader
