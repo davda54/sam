@@ -12,7 +12,7 @@ from torch.utils.data import DataLoader, Dataset
 from tqdm.auto import tqdm
 
 from model.wide_res_net import WideResNet
-from src.train import set_crop_size
+from train import set_crop_size
 from utility.cifar_utils import (
     cifar100_stats,
     coarse_classes,
