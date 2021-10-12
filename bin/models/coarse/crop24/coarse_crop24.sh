@@ -1,3 +1,5 @@
+#!/bin/sh
+
 tmux new-session -d -s "24_6_16_2" bash bin/coarse/crop24/24_6_16_2.sh
 tmux new-session -d -s "24_6_16_8" bash bin/coarse/crop24/24_6_16_8.sh
 tmux new-session -d -s "24_6_16_10" bash bin/coarse/crop24/24_6_16_10.sh
