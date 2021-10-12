@@ -171,7 +171,7 @@ def evaluate(dataloader, model, device, dataset_type: str):
             # Data munging for embeddings
             embeds_zip = zip(idxs, embeds.cpu())
             for idx, embed in embeds_zip:
-                model_embeddings[idx] = embed
+                model_embeddings[idx.tolist()] = embed.tolist()
     accuracy = total_correct / count
     return model_results, accuracy, model_embeddings
 
