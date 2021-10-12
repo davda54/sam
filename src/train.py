@@ -53,21 +53,21 @@ def set_padding_amount(dataloader, padding_amount: int):
 def determine_params(crop_size: int) -> (int, int):
     """
     # !!! NOTE KERNEL AND PADDING SIZE DEPENDS ON CROP SIZE !!!
-    # crop 32 = kernel 8 = pad 4
-    # crop 24 = kernel 6 = pad 3
-    # crop 16 = kernel 4 = pad 2
-    # crop 8 = kernel 2 = pad 1
+    # crop 32 = kernel 8
+    # crop 24 = kernel 6
+    # crop 16 = kernel 4
+    # crop 8 = kernel 2
     :param crop_size:
     :return: kernel_size, padding_amount
     """
     if crop_size == 32:
         return 8, 4
     elif crop_size == 24:
-        return 6, 3
+        return 6, 4
     elif crop_size == 16:
-        return 4, 2
+        return 4, 4
     elif crop_size == 8:
-        return 2, 1
+        return 2, 4
     else:
         raise ValueError("invalid crop size")
 
