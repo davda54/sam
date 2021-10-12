@@ -146,7 +146,8 @@ def evaluate(dataloader, model, device, dataset_type):
         ):
             inputs, targets = inputs.to(device), targets.to(device)
             count += len(inputs)
-            outputs = model(inputs)
+            outputs, embeddings = model(inputs)
+            # TODO: Put `embeddings` in dict with each embedding keyed to the image index and pickle the dictionary
             # total_loss += smooth_crossentropy(outputs, targets)
             predictions = torch.argmax(outputs, 1)
             correct = predictions == targets
@@ -247,7 +248,7 @@ def main(_args):
         writer = csv.writer(f)
         writer.writerow(profile_fields)
 
-    # TODO: Can I speed this up using multiprocessing?
+    # TODO: [OPTIONAL] Can I speed this up using multiprocessing?
     for model_path in tqdm(model_paths, desc="Model evaluations", leave=False):
         model_filename = parse_model_path(model_path)
         print(model_filename)
@@ -281,12 +282,11 @@ def main(_args):
         else:
             raise ValueError("model filename does not contain granularity")
 
-        # TODO: Set crop size from the model
         # Sets the crop size on the RandomCrop transform to fit the model
         set_crop_size(test_dataloader, crop_size)
         set_crop_size(validation_dataloader, crop_size)
 
-        # TODO: Set the dataloader's batch size based on the crop size to increase evaluation speed
+        # TODO: [OPTIONAL] Set the dataloader's batch size based on the crop size to increase evaluation speed
 
         model = WideResNet(
             kernel_size=kernel_size,

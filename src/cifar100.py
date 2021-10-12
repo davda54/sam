@@ -56,7 +56,7 @@ def make_cifar100(_arg):
     _test_set = torchvision.datasets.CIFAR100(
         root=str(cifar100), train=False, download=False, transform=test_transform,
     )
-    # TODO: Make a function that selects the desired superclass
+    # TODO: [OPTIONAL] Functionalize the code for selecting our desired superclass
     if use_fine_classes:
         coarse_idx = coarse_class_to_idx[
             superclass
