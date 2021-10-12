@@ -174,19 +174,15 @@ class WideResNet(nn.Module):
                     ),
                     ("4_normalization", nn.BatchNorm2d(self.filters[3])),
                     ("5_activation", nn.ReLU(inplace=True)),
-                    (
-                        "6_pooling",
-                        nn.AvgPool2d(kernel_size=kernel_size),
-                    ),  # default is 8, changed to deal with small sizes
+                    ("6_pooling", nn.AvgPool2d(kernel_size=kernel_size)),
                     ("7_flattening", nn.Flatten()),
-                    (
-                        "8_classification",
-                        nn.Linear(in_features=self.filters[3], out_features=labels),
-                    ),
                 ]
             )
         )
 
+        self.embedding_to_output = nn.Linear(
+            in_features=self.filters[3], out_features=labels
+        )
         self._initialize()
 
     def _initialize(self):
@@ -205,4 +201,5 @@ class WideResNet(nn.Module):
                 m.bias.data.zero_()
 
     def forward(self, x):
-        return self.f(x)
+        embedding = self.f(x)
+        return self.embedding_to_output(embedding), embedding
