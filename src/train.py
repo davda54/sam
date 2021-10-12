@@ -63,11 +63,11 @@ def determine_params(crop_size: int) -> (int, int):
     if crop_size == 32:
         return 8, 4
     elif crop_size == 24:
-        return 6, 4
+        return 6, 4 # could be 3 instead
     elif crop_size == 16:
-        return 4, 4
+        return 4, 4 # could be 2 instead
     elif crop_size == 8:
-        return 2, 4
+        return 2, 4 # could be 1 instead
     else:
         raise ValueError("invalid crop size")
 
