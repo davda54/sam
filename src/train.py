@@ -217,8 +217,8 @@ if __name__ == "__main__":
         width_factor=args.width_factor,
         dropout=args.dropout,
         kernel_size=kernel_size,
-        in_channels=n_labels,
-        labels=20,
+        in_channels=3,
+        labels=n_labels,
     ).to(device)
 
     base_optimizer = torch.optim.SGD
