@@ -201,14 +201,15 @@ if __name__ == "__main__":
 
             # first forward-backward step
             enable_running_stats(model)
-            predictions = model(inputs)
+            predictions, _ = model(inputs)  # Ignore the embedding output
             loss = smooth_crossentropy(predictions, targets)
             loss.mean().backward()
             optimizer.first_step(zero_grad=True)
 
             # second forward-backward step
             disable_running_stats(model)
-            smooth_crossentropy(model(inputs), targets).mean().backward()
+            predictions_2nd, _ = model(inputs)  # Ignore the embedding output
+            smooth_crossentropy(predictions_2nd, targets).mean().backward()
             optimizer.second_step(zero_grad=True)
 
             with torch.no_grad():
@@ -224,7 +225,8 @@ if __name__ == "__main__":
         with torch.no_grad():
             for batch in test_set:
                 inputs, targets = (b.to(device) for b in batch)
-                predictions = model(inputs)
+
+                predictions, _ = model(inputs)  # XXXXX add embedding outputs
                 loss = smooth_crossentropy(predictions, targets)
                 batch_loss = loss.sum().item()
                 epoch_loss += batch_loss

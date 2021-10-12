@@ -16,8 +16,10 @@ from utility.cifar_utils import (
     save_dataset,
 )
 from utility.cutout import Cutout
-from utility.misc_utils import get_project_root
+from pathlib import Path
 
+def get_project_root() -> Path:
+    return Path(__file__).parent.parent
 
 def make_cifar100(_arg):
     use_fine_classes, crop_size, superclass = (
@@ -56,7 +58,7 @@ def make_cifar100(_arg):
     _test_set = torchvision.datasets.CIFAR100(
         root=str(cifar100), train=False, download=False, transform=test_transform,
     )
-    # TODO: Make a function that selects the desired superclass
+    # TODO: [OPTIONAL] Functionalize the code for selecting our desired superclass
     if use_fine_classes:
         coarse_idx = coarse_class_to_idx[
             superclass
@@ -97,9 +99,6 @@ if __name__ == "__main__":
         type=int,
         help="Crop size used in data transformations.",
     )
-    parser.add_argument(
-        "--gpu", default=7, type=int, help="Index of GPU to use",
-    )
     args = parser.parse_args()
     print(args)
 
@@ -114,8 +113,6 @@ if __name__ == "__main__":
         args.granularity = "coarse"
         if not args.superclass:
             superclass = "all"
-
-    device = torch.device(f"cuda:{args.gpu}" if torch.cuda.is_available() else "cpu")
 
     random.seed(42)
     train_set, test_set = make_cifar100(args)
