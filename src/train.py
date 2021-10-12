@@ -31,9 +31,9 @@ def set_crop_size(dataloader, crop_size: int):
     """
     takes in a dataloader containing dataset CIFAR100Indexed and sets size of the RandomCrop
     """
-    for i, t in enumerate(dataloader.dataset.cifar100.transforms.transform.transforms):
+    for i, t in enumerate(dataloader.dataset.transforms.transform.transforms):
         if type(t) == torchvision.transforms.transforms.RandomCrop:
-            dataloader.dataset.cifar100.transforms.transform.transforms[i].size = (
+            dataloader.dataset.transforms.transform.transforms[i].size = (
                 crop_size,
                 crop_size,
             )
@@ -43,9 +43,9 @@ def set_padding_amount(dataloader, padding_amount: int):
     """
     takes in a dataloader containing dataset CIFAR100Indexed and sets amount of padding for the RandomCrop
     """
-    for i, t in enumerate(dataloader.dataset.cifar100.transforms.transform.transforms):
+    for i, t in enumerate(dataloader.dataset.transforms.transform.transforms):
         if type(t) == transforms.RandomCrop:
-            dataloader.dataset.cifar100.transforms.transform.transforms[
+            dataloader.dataset.transforms.transform.transforms[
                 i
             ].padding = padding_amount
 

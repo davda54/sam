@@ -12,7 +12,6 @@ from torch.utils.data import DataLoader, Dataset
 from tqdm.auto import tqdm
 
 from model.wide_res_net import WideResNet
-from train import set_crop_size
 from utility.cifar_utils import (
     cifar100_stats,
     coarse_classes,
@@ -55,6 +54,16 @@ profile_fields = [
 ]
 Profile = namedtuple("Profile", profile_fields,)
 
+def set_crop_size(dataloader, crop_size: int):
+    """
+    takes in a dataloader containing dataset CIFAR100Indexed and sets size of the RandomCrop
+    """
+    for i, t in enumerate(dataloader.dataset.cifar100.transforms.transform.transforms):
+        if type(t) == torchvision.transforms.transforms.RandomCrop:
+            dataloader.dataset.cifar100.transforms.transform.transforms[i].size = (
+                crop_size,
+                crop_size,
+            )
 
 def get_granularity(name: str) -> str:
     if "coarse" in name:
@@ -63,10 +72,6 @@ def get_granularity(name: str) -> str:
         return "fine"
     else:
         raise ValueError("granularity not found")
-
-
-def get_superclass(name: str) -> int:
-    pass
 
 
 def get_parameter(name: str, param: str) -> int:
