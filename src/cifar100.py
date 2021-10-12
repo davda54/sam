@@ -99,9 +99,6 @@ if __name__ == "__main__":
         type=int,
         help="Crop size used in data transformations.",
     )
-    parser.add_argument(
-        "--gpu", default=7, type=int, help="Index of GPU to use",
-    )
     args = parser.parse_args()
     print(args)
 
@@ -116,8 +113,6 @@ if __name__ == "__main__":
         args.granularity = "coarse"
         if not args.superclass:
             superclass = "all"
-
-    device = torch.device(f"cuda:{args.gpu}" if torch.cuda.is_available() else "cpu")
 
     random.seed(42)
     train_set, test_set = make_cifar100(args)
