@@ -253,7 +253,9 @@ def main(_args):
         writer = csv.writer(f)
         writer.writerow(profile_fields)
 
+    model_path = _args.model_path
     model_filename = parse_model_path(_args.model_path)
+
     print(model_filename)
 
     (
