@@ -16,8 +16,10 @@ from utility.cifar_utils import (
     save_dataset,
 )
 from utility.cutout import Cutout
-from utility.misc_utils import get_project_root
+from pathlib import Path
 
+def get_project_root() -> Path:
+    return Path(__file__).parent.parent
 
 def make_cifar100(_arg):
     use_fine_classes, crop_size, superclass = (
