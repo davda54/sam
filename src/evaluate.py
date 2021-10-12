@@ -135,8 +135,17 @@ def find_model_files(model_path=(project_path / "models")):
     return model_files
 
 
-def evaluate(dataloader, model, device, dataset_type):
-    results = []
+def evaluate(dataloader, model, device, dataset_type: str):
+    """
+
+    :param dataloader: Dataloader containing CIFAR100Indexed
+    :param model: WideResNet model object
+    :param device: CUDA device
+    :param dataset_type: Text string with the data split (train, test, validate, etc)
+    :return:
+    """
+    model_results = []
+    model_embeddings = {}
     # total_loss = 0.0
     total_correct = 0.0
     count = 0.0
@@ -146,21 +155,28 @@ def evaluate(dataloader, model, device, dataset_type):
         ):
             inputs, targets = inputs.to(device), targets.to(device)
             count += len(inputs)
-            outputs, embeddings = model(inputs)
+            outputs, embeds = model(inputs)
             # TODO: Put `embeddings` in dict with each embedding keyed to the image index and pickle the dictionary
             # total_loss += smooth_crossentropy(outputs, targets)
             predictions = torch.argmax(outputs, 1)
             correct = predictions == targets
             total_correct += correct.sum().item()
-            zipped = zip(
+
+            # Data munging for predictions
+            predict_zip = zip(
                 idxs,
                 zip(*(predictions.cpu(), targets.cpu(), correct.cpu(), outputs.cpu())),
             )
-            for idx, data in zipped:
+            for idx, data in predict_zip:
                 result_ = [idx.tolist()] + [d.tolist() for d in data]
-                results.append(Result(*result_))
+                model_results.append(Result(*result_))
+
+            # Data munging for embeddings
+            embeds_zip = zip(idxs, embeds.cpu())
+            for idx, embed in embeds_zip:
+                model_embeddings[idx] = embed
     accuracy = total_correct / count
-    return results, accuracy
+    return model_results, accuracy, model_embeddings
 
 
 def split_outputs_column(df: pd.DataFrame, n_outputs: int):
@@ -304,14 +320,27 @@ def main(_args):
         model.cuda(device)
         model.eval()
 
-        test_results, _ = evaluate(test_dataloader, model, device, "test")
+        test_results, test_accuracy, test_embeddings = evaluate(
+            test_dataloader, model, device, "test"
+        )
         test_df = pd.DataFrame(test_results)
         test_df = split_outputs_column(test_df, n_labels)
         test_df.to_csv(
-            path_or_buf=str(evaluations_path / f"test_eval__{model_filename}.csv"),
+            path_or_buf=str(
+                evaluations_path
+                / "predictions"
+                / f"test_predicts__{model_filename}.csv"
+            ),
             index=False,
         )
+        import pickle
 
+        test_embeds_pkl = open(
+            str(evaluations_path / "embeddings" / f"test_embeds__{model_filename}.pkl"),
+            "wb",
+        )
+        pickle.dump(test_embeddings, test_embeds_pkl)
+        test_embeds_pkl.close()
         macs, params = get_model_complexity_info(
             model,
             (3, crop_size, crop_size),
@@ -321,15 +350,27 @@ def main(_args):
         )
         flops = f"{2*float(macs.split(' ')[0])} GFLOPs"
 
-        validation_results, validation_accuracy = evaluate(
+        validation_results, validation_accuracy, validation_embeddings = evaluate(
             validation_dataloader, model, device, "validation"
         )
+        validation_embeds_pkl = open(
+            str(
+                evaluations_path
+                / "embeddings"
+                / f"validation_embeds__{model_filename}.pkl"
+            ),
+            "wb",
+        )
+        pickle.dump(validation_embeddings, validation_embeds_pkl)
+        validation_embeds_pkl.close()
+
         validation_df = pd.DataFrame(validation_results)
         validation_df = split_outputs_column(validation_df, n_labels)
-
         validation_df.to_csv(
             path_or_buf=str(
-                evaluations_path / f"validation_eval__{model_filename}.csv"
+                evaluations_path
+                / "predictions"
+                / f"validation_predicts__{model_filename}.csv"
             ),
             index=False,
         )
