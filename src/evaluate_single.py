@@ -27,10 +27,18 @@ from itertools import compress
 from utility.cifar_utils import coarse_class_to_idx
 
 project_path = Path(__file__).parent.parent
+
 dataset_path = project_path / "datasets"
 dataset_path.mkdir(parents=True, exist_ok=True)
+
 evaluations_path = project_path / "evaluations"
 evaluations_path.mkdir(parents=True, exist_ok=True)
+
+predictions_path = evaluations_path / "predictions"
+predictions_path.mkdir(exist_ok=True, parents=True)
+
+embeddings_path = evaluations_path / "embeddings"
+embeddings_path.mkdir(exist_ok=True, parents=True)
 
 Result = namedtuple("Result", ["idx", "prediction", "target", "correct", "outputs"])
 profile_fields = [
@@ -244,8 +252,8 @@ def main(_args):
     validation_fine_dataloader = get_validation_dataloader(coarse=False)
     validation_coarse_dataloader = get_validation_dataloader(coarse=True)
 
+    # TODO: Instead of passing in an entire model path, pass in the name of the model and find it in the directory
     # model_paths = find_model_files()
-
     # model_paths = model_paths[: _args.limit]
 
     profiles_path = evaluations_path / "model_profiles.csv"
@@ -315,19 +323,15 @@ def main(_args):
     )
     test_df = pd.DataFrame(test_results)
     test_df = split_outputs_column(test_df, n_labels)
+
     test_df.to_csv(
-        path_or_buf=str(
-            evaluations_path
-            / "predictions"
-            / f"test_predicts__{model_filename}.csv"
-        ),
+        path_or_buf=str(predictions_path / f"test_predicts__{model_filename}.csv"),
         index=False,
     )
     import pickle
 
     test_embeds_pkl = open(
-        str(evaluations_path / "embeddings" / f"test_embeds__{model_filename}.pkl"),
-        "wb",
+        str(embeddings_path / f"test_embeds__{model_filename}.pkl"), "wb",
     )
     pickle.dump(test_embeddings, test_embeds_pkl)
     test_embeds_pkl.close()
@@ -344,12 +348,7 @@ def main(_args):
         validation_dataloader, model, device, "validation"
     )
     validation_embeds_pkl = open(
-        str(
-            evaluations_path
-            / "embeddings"
-            / f"validation_embeds__{model_filename}.pkl"
-        ),
-        "wb",
+        str(embeddings_path / f"validation_embeds__{model_filename}.pkl"), "wb",
     )
     pickle.dump(validation_embeddings, validation_embeds_pkl)
     validation_embeds_pkl.close()
@@ -358,9 +357,7 @@ def main(_args):
     validation_df = split_outputs_column(validation_df, n_labels)
     validation_df.to_csv(
         path_or_buf=str(
-            evaluations_path
-            / "predictions"
-            / f"validation_predicts__{model_filename}.csv"
+            predictions_path / f"validation_predicts__{model_filename}.csv"
         ),
         index=False,
     )
@@ -376,7 +373,10 @@ if __name__ == "__main__":
         "--gpu", default=3, type=int, help="Index of GPU to use",
     )
     parser.add_argument(
-        "--model_path", default=None, type=str, help="Path to the model we want to evaluate",
+        "--model_path",
+        default=None,
+        type=str,
+        help="Path to the model we want to evaluate",
     )
     args = parser.parse_args()
     print("Getting model results")
