@@ -50,13 +50,13 @@ if __name__ == "__main__":
             # first forward-backward step
             enable_running_stats(model)
             predictions = model(inputs)
-            loss = smooth_crossentropy(predictions, targets)
+            loss = smooth_crossentropy(predictions, targets, smoothing=args.label_smoothing)
             loss.mean().backward()
             optimizer.first_step(zero_grad=True)
 
             # second forward-backward step
             disable_running_stats(model)
-            smooth_crossentropy(model(inputs), targets).mean().backward()
+            smooth_crossentropy(model(inputs), targets, smoothing=args.label_smoothing).mean().backward()
             optimizer.second_step(zero_grad=True)
 
             with torch.no_grad():
